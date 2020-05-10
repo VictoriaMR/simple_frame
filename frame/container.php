@@ -5,24 +5,25 @@
  */
 final class Container
 {
-
-    protected $basePath;
+    static private $instance;
 
     /**
      *  容器绑定，用来装提供的实例或者 提供实例的回调函数
      * @var array
      */
-    protected $building = [];
+    static protected $building = [];
 
-    /**
-     * Create a new Illuminate application instance.
-     *
-     * @param  string|null  $basePath
-     * @return void
-     */
-    public function __construct($basePath = null)
+    public function __construct(){}
+
+    private function __clone(){}
+
+    static public function getInstance()
     {
-
+        //判断$instance是否是Singleton的对象，不是则创建
+        if (!(self::$instance instanceof self)) {
+            self::$instance = new self();
+        }
+        return self::$instance;
     }
 
     public function autoload($abstract) 
@@ -43,9 +44,10 @@ final class Container
 
         if(!$concrete instanceOf Closure){
             $concrete = $this->getClosure($abstract, $concrete);
+            print_r($concrete);
         }
 
-        $this->building[$abstract] =  compact('concrete', 'shared');
+        self::$building[$abstract] =  compact('concrete', 'shared');
     }
 
     //注册一个共享的绑定 单例
@@ -78,6 +80,7 @@ final class Container
 
         if($this->isBuildable($concrete, $abstract)){
             $object = $this->build($concrete);
+            // dd(12312);
         }else{
             $object = $this->make($concrete);
         }
@@ -90,11 +93,11 @@ final class Container
      */
     public function getConcrete($abstract)
     {
-        if(!isset($this->building[$abstract])){
+        if(!isset(self::$building[$abstract])){
             return $abstract;
         }
 
-        return $this->building[$abstract]['concrete'];
+        return self::$building[$abstract]['concrete'];
     }
 
     /**
@@ -116,6 +119,7 @@ final class Container
 
         //创建反射对象
         $reflector = new ReflectionClass($concrete);
+        echo $concrete.PHP_EOL;
 
         if( ! $reflector->isInstantiable()){
             //抛出异常
@@ -126,6 +130,8 @@ final class Container
         if(is_null($constructor)){
             return new $concrete;
         }
+
+        self::$building[$concrete] = $constructor;
 
         $dependencies = $constructor->getParameters();
         $instance = $this->getDependencies($dependencies);
