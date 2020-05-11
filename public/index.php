@@ -22,4 +22,4 @@ if (is_file(ROOT_PATH.'vendor/autoload.php')) {
 //加载 框架 执行文件
 require_once ROOT_PATH.'frame/start.php';
 
-exit('Hello World!');
+exit('Hello Simple PHP!');
