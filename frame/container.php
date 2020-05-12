@@ -76,6 +76,9 @@ final class Container
      */
     public function make($abstract)
     {
+        if (!empty(self::$building[$abstract]))
+            return self::$building[$abstract];
+             
         $concrete = $this->getConcrete($abstract);
 
         if($this->isBuildable($concrete, $abstract)){
@@ -93,11 +96,11 @@ final class Container
      */
     public function getConcrete($abstract)
     {
-        if(!isset(self::$building[$abstract])){
+        if(empty(self::$building[$abstract])){
             return $abstract;
         }
 
-        return self::$building[$abstract]['concrete'];
+        return self::$building[$abstract];
     }
 
     /**
@@ -119,6 +122,7 @@ final class Container
 
         //创建反射对象
         $reflector = new ReflectionClass($concrete);
+
         echo $concrete.PHP_EOL;
 
         if( ! $reflector->isInstantiable()){
@@ -131,12 +135,21 @@ final class Container
             return new $concrete;
         }
 
-        self::$building[$concrete] = $constructor;
+        // print_r($constructor);
+        // die();
+
+        // self::$building[$concrete] = $constructor;
 
         $dependencies = $constructor->getParameters();
         $instance = $this->getDependencies($dependencies);
 
-        return $reflector->newInstanceArgs($instance);
+        // dd($reflector->newInstanceArgs($instance));
+
+        $object = $reflector->newInstanceArgs($instance);
+
+        self::$building[$concrete] = $object;
+
+        return $object;
 
     }
 
