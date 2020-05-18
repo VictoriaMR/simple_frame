@@ -19,6 +19,8 @@ class IndexController
 
 	public function index()
 	{
+		print_r(\DB::table()->where());
+		dd();
 		\App::make('App\Http\Controllers\Home\IndexController');
 		\App::make('App\Http\Controllers\Home\IndexController');
 		dd(\Router::analyze_params());

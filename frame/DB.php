@@ -1,15 +1,31 @@
 <?php
-namespace mvc;
-use mvc\Connection;
 
 class DB
 {
+	protected $_instance = null;
 	protected $dataBase = null;
 	protected $Db = null;
+	protected $table = null;
+	protected $params = [];
+	protected $where = [];
+	protected $select = [];
+
 
 	function __construct($dataBase = null)
 	{
-		$this->Db = Connection::getInstance($dataBase);
+		// $this = self::getInstance();
+		// $this->Db = Connection::getInstance($dataBase);
+	}
+
+	public static function getInstance($database = null) 
+	{
+		//检测类是否被实例化
+		if (!(self::$_instance instanceof self)) {
+
+			self::$_instance = new self();
+		}
+
+		return self::$_connect;
 	}
 
 	/**
@@ -94,6 +110,21 @@ class DB
 		}
 
 		return !empty($returnData) ? $returnData : true;
+	}
+
+	public static function table($table = '')
+	{
+		self::$table = $table;
+		return self;
+	}
+
+	public function where()
+	{
+		// if (empty($field) && empty($filter)) return false;
+
+		// $this->where[''];
+
+		return $this;
 	}
 
 	/**
@@ -263,7 +294,7 @@ class DB
 	protected function analyzeWhere($where = [])
 	{
 		$returnData = ['where'=>'', 'param' => []];
-		if (empty($where)) return ['where'=>'1=1', 'param' => []];
+		if (empty($where)) return ['where'=>'', 'param' => []];
 
 		foreach ($where as $key => $value) {
 			if (is_array($value)) {
@@ -350,5 +381,3 @@ class DB
 		return $typeStr;
 	}
 }
-
-?>
