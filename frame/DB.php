@@ -2,19 +2,11 @@
 
 class DB
 {
-	protected $_instance = null;
-	protected $dataBase = null;
-	protected $Db = null;
-	protected $table = null;
-	protected $params = [];
-	protected $where = [];
-	protected $select = [];
+	protected static $_query = null;
 
-
-	function __construct($dataBase = null)
+	function __construct(Query $query)
 	{
-		// $this = self::getInstance();
-		// $this->Db = Connection::getInstance($dataBase);
+		self::$_query = $query;
 	}
 
 	public static function getInstance($database = null) 
@@ -25,106 +17,19 @@ class DB
 			self::$_instance = new self();
 		}
 
-		return self::$_connect;
+		return self::$_instance;
 	}
 
-	/**
-	 * @method 查询语句 sql + 预处理语句结果
-	 * @author Victoria
-	 * @date   2020-04-11
-	 * @return array
-	 */
-	public function query($sql = '', $params = [])
+	public static function connection($conn = 'default')
 	{
-		$returnData = [];
-		if (empty($sql)) return $returnData;
-
-		if (!empty($params)) {
-
-			if ($stmt = $this->Db->prepare($sql)) {
-				//这里是引用传递参数
-			    if(is_array($params))
-		        {
-		        	if (!is_array(current($params))) {
-		        		reset($params);
-		        		$params = [$params];
-		        	}
-
-		        	foreach ($params as $key => $value) {
-		        		$type = $this->analyzeType($value);
-			            $bind_names[] = $type;
-			            for ($i=0; $i < count($value); $i++) 
-			            {
-			                $bind_name = 'bind_' . $i;
-			                $$bind_name = $value[$i];
-			                $bind_names[] = &$$bind_name;
-			            }
-
-		            	call_user_func_array(array($stmt, 'bind_param'), $bind_names);
-
-		            	/* execute query */
-			    		$stmt->execute();
-				        $meta = $stmt->result_metadata(); 
-
-				        if ($meta->type) {
-					        $variables = [];
-					        $data = [];
-					        while ($field = $meta->fetch_field()) { 
-					            $variables[] = &$data[$field->name];
-					        }
-
-					        call_user_func_array(array($stmt, 'bind_result'), $variables); 
-
-					        $i=0;
-					        while($stmt->fetch())
-					        {
-					            $returnData[$i] = [];
-					            foreach($data as $k => $v) {
-					                $returnData[$i][$k] = $v;
-					            }
-
-					            $i++;
-					        }
-				        }
-		        	}
-		        } else {
-		        	die('SQL 参数设置错误!');
-		        }
-
-			    $stmt->free_result();
-			    $stmt->close();
-			} else {
-				die((getenv('APP_DEBUG') ? $sql : '') . ' SQL 错误!');
-			}
-		} else {
-			if ($stmt = $this->Db->query($sql)) {
-				// Cycle through results
-				while ($row = $stmt->fetch_assoc()){
-				 	$returnData[] = $row;
-				}
-
-				$stmt->free();
-
-				return $returnData;
-			}
-		}
-
-		return !empty($returnData) ? $returnData : true;
+		self::$_query->_database = $conn;
+		return self::$_query;
 	}
 
 	public static function table($table = '')
 	{
-		self::$table = $table;
-		return self;
-	}
-
-	public function where()
-	{
-		// if (empty($field) && empty($filter)) return false;
-
-		// $this->where[''];
-
-		return $this;
+		self::$_query->_table = $table;
+		return $this->query;
 	}
 
 	/**
@@ -249,16 +154,7 @@ class DB
 		return $result;
 	}
 
-	private function analyzeMatch($data)
-	{
-		if (empty($data) || !is_array($data)) return '';
-		$str = '';
-		for ($i=0; $i < count($data); $i++) { 
-			$str .= '? ,';
-		}
-
-		return trim(trim(trim($str), ','));
-	}
+	
 
 	protected function analyzeOrderBy($orderBy = [])
 	{

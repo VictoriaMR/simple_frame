@@ -38,11 +38,11 @@ final class Container
      */
     public function bind($abstract, $concrete = null, $shared = false)
     {
-        if(is_null($concrete)){
+        if (is_null($concrete)){
             $concrete = $abstract;
         }
 
-        if(!$concrete instanceOf Closure){
+        if (!$concrete instanceOf Closure){
             $concrete = $this->getClosure($abstract, $concrete);
             print_r($concrete);
         }
@@ -51,7 +51,8 @@ final class Container
     }
 
     //注册一个共享的绑定 单例
-    public function singleton($abstract, $concrete, $shared = true){
+    public function singleton($abstract, $concrete, $shared = true)
+    {
         $this->bind($abstract, $concrete, $shared);
     }
 
@@ -81,10 +82,9 @@ final class Container
              
         $concrete = $this->getConcrete($abstract);
 
-        if($this->isBuildable($concrete, $abstract)){
+        if ($this->isBuildable($concrete, $abstract)) {
             $object = $this->build($concrete);
-            // dd(12312);
-        }else{
+        } else {
             $object = $this->make($concrete);
         }
 
@@ -96,7 +96,7 @@ final class Container
      */
     public function getConcrete($abstract)
     {
-        if(empty(self::$building[$abstract])){
+        if (empty(self::$building[$abstract])){
             return $abstract;
         }
 
@@ -123,8 +123,6 @@ final class Container
         //创建反射对象
         $reflector = new ReflectionClass($concrete);
 
-        echo $concrete.PHP_EOL;
-
         if( ! $reflector->isInstantiable()){
             //抛出异常
             throw new \Exception('无法实例化');
@@ -135,15 +133,8 @@ final class Container
             return new $concrete;
         }
 
-        // print_r($constructor);
-        // die();
-
-        // self::$building[$concrete] = $constructor;
-
         $dependencies = $constructor->getParameters();
         $instance = $this->getDependencies($dependencies);
-
-        // dd($reflector->newInstanceArgs($instance));
 
         $object = $reflector->newInstanceArgs($instance);
 

@@ -19,8 +19,8 @@ class IndexController
 
 	public function index()
 	{
-		print_r(\DB::table()->where());
-		dd();
+		print_r(\DB::connection(123123)->where('name', 1)->where('id', 1)->orWhere('phone', 1)->get());
+		dd(microtime(true) - APP_START_TIME);
 		\App::make('App\Http\Controllers\Home\IndexController');
 		\App::make('App\Http\Controllers\Home\IndexController');
 		dd(\Router::analyze_params());
