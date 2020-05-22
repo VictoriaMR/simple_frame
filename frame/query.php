@@ -32,8 +32,27 @@ Class Query
 		$this->_where[] = [[$column, $operator, $value]];
 
 		return $this;
-
 	}
+
+	public function limit($value)
+    {
+        $property = $this->unions ? 'unionLimit' : 'limit';
+
+        if ($value >= 0) {
+            $this->$property = $value;
+        }
+
+        return $this;
+    }
+
+	public function offset($value)
+    {
+        $property = $this->unions ? 'unionOffset' : 'offset';
+
+        $this->$property = max(0, $value);
+
+        return $this;
+    }
 
 	public function get()
 	{
