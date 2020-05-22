@@ -5,6 +5,8 @@ Class Query
 	public $_database = null;
 	public $_table = null;
 	public $_where = [];
+	protected $offset = 1;
+	protected $limit = 1;
 
 	public function where($column, $operator, $value = null)
 	{
@@ -36,20 +38,14 @@ Class Query
 
 	public function limit($value)
     {
-        $property = $this->unions ? 'unionLimit' : 'limit';
-
-        if ($value >= 0) {
-            $this->$property = $value;
-        }
+        $this->$limit = max(1, (int) $value);
 
         return $this;
     }
 
 	public function offset($value)
     {
-        $property = $this->unions ? 'unionOffset' : 'offset';
-
-        $this->$property = max(0, $value);
+        $this->$offset = max(1, (int) $value);
 
         return $this;
     }
