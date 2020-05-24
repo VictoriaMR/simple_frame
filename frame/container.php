@@ -120,12 +120,15 @@ final class Container
             return $concrete($this);
         }
 
+        if ($concrete == 'Connection') return false;
+
         //创建反射对象
         $reflector = new ReflectionClass($concrete);
 
         if( ! $reflector->isInstantiable()){
             //抛出异常
-            throw new \Exception('无法实例化');
+            // dd($concrete);
+            // throw new \Exception('无法实例化');
         }
 
         $constructor = $reflector->getConstructor();

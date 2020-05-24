@@ -19,7 +19,12 @@ class IndexController
 
 	public function index()
 	{
-		print_r(\DB::connection(123123)->where('name', 1)->where('id', 1)->orWhere('phone', 1)->get());
+		print_r(\DB::connection('mysql')->table('user')->count());
+
+		print_r(\DB::connection('sys')->table('sys_config')->count());
+
+		print_r(\DB::connection('sys')->table('sys_config')->count());
+
 		dd(microtime(true) - APP_START_TIME);
 		\App::make('App\Http\Controllers\Home\IndexController');
 		\App::make('App\Http\Controllers\Home\IndexController');

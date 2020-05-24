@@ -4,9 +4,24 @@ Class Query
 {
 	public $_database = null;
 	public $_table = null;
-	public $_where = [];
-	protected $offset = 1;
-	protected $limit = 1;
+	protected $_columns = null;
+	protected $_where = [];
+	protected $_whereStr = '';
+	protected $_param = [];
+	protected $_groupBy = '';
+	protected $_orderBy = '';
+	protected $_offset = 0;
+	protected $_limit = 0;
+
+	public function table($table = '')
+	{
+		if (empty($table))
+			throw new Exception('MySQL SELECT QUERY, table can not be empty!', 1);
+
+		$this->_table = $table;
+
+		return $this;
+	}
 
 	public function where($column, $operator, $value = null)
 	{
@@ -20,6 +35,11 @@ Class Query
 		return $this;
 	}
 
+	public function whereIn($column, $value = []) 
+	{
+		return $this->where($column, 'IN', $value);
+	}
+
 	public function orWhere($column, $operator, $value = null)
 	{
 		if (empty($value)) {
@@ -27,33 +47,113 @@ Class Query
 			$operator = '=';
 		}
 
-		if (!empty($this->_where)) {
-			// $this->_where = [$this->_where];
-		}
-
 		$this->_where[] = [[$column, $operator, $value]];
+
+		return $this;
+	}
+
+	public function select($columns = ['*'])
+	{
+		$this->columns = [];
+
+        $columns = is_array($columns) ? $columns : func_get_args();
+
+        $this->columns = $columns;
+
+        return $this;
+	}
+
+	public function groupBy($value = '')
+	{
+		$this->_groupBy = $value;
+
+		return $this;
+	}
+
+	public function orderBy($value = '', $type = 'DESC')
+	{
+		$this->_orderBy = $value . ' ' . strtoupper($type);
 
 		return $this;
 	}
 
 	public function limit($value)
     {
-        $this->$limit = max(1, (int) $value);
+        $this->$limit = (int) $value;
 
         return $this;
     }
 
 	public function offset($value)
     {
-        $this->$offset = max(1, (int) $value);
+        $this->$offset = (int) $value;
 
         return $this;
     }
 
 	public function get()
 	{
-		dd($this->analyzeWhere());
-		return $this;
+		return $this->getResult();
+	}
+
+	public function find()
+	{
+		$this->_offset = 1;
+		$this->_limit = 1;
+
+		return $this->getResult()[0] ?? [];
+	}
+
+	public function count()
+	{
+		$this->_columns = ['COUNT(*) as count'];
+		$this->_offset = 0;
+		$this->_limit = 0;
+
+		$result = $this->getResult();
+
+		return $result[0]['count'] ?? 0;
+	}
+
+	public function getResult()
+	{
+		$sql = $this->getSql();
+
+		return $this->getQuery($sql, $this->_param);
+	}
+
+	public function getSql()
+	{
+		if (empty($this->_table)) {
+			throw new Exception('MySQL SELECT QUERY, table not exist!', 1);
+		}
+
+		//解析条件
+		$this->analyzeWhere();
+
+		$sql = sprintf('SELECT %s FROM %s', !empty($this->_columns) ? implode(',', $this->_columns) : '*', $this->_table ?? '');
+
+		if (!empty($this->_whereStr)) {
+			$sql .= ' WHERE ' . $this->_whereStr;
+		}
+
+		if (!empty($this->_groupBy)) {
+			$sql .= ' GROUP BY ' . $this->_groupBy;
+		}
+
+		if (!empty($this->_orderBy)) {
+			$sql .= ' ORDER BY ' . $this->_orderBy;
+		}
+
+		if (!empty($this->_offset)) {
+			$sql .= ' LIMIT ' . $this->_offset;
+		}
+
+		if (!empty($this->_limit)) {
+			$sql .= ',' . $this->_limit;
+		}
+
+		return $sql;
 	}
 
 	/**
@@ -63,12 +163,14 @@ Class Query
 	 */
 	public function getQuery($sql = '', $params = [])
 	{
+		$conn = Connection::getInstance($this->_database);
+
 		$returnData = [];
 		if (empty($sql)) return $returnData;
 
 		if (!empty($params)) {
 
-			if ($stmt = $this->Db->prepare($sql)) {
+			if ($stmt = $conn->prepare($sql)) {
 				//这里是引用传递参数
 			    if(is_array($params))
 		        {
@@ -115,17 +217,16 @@ Class Query
 				        }
 		        	}
 		        } else {
-		        	die('SQL 参数设置错误!');
+		        	throw new Exception('SQL 参数设置错误!');
 		        }
 
 			    $stmt->free_result();
 			    $stmt->close();
 			} else {
-				die((getenv('APP_DEBUG') ? $sql : '') . ' SQL 错误!');
+				throw new Exception($sql . ' SQL 错误!');
 			}
 		} else {
-			if ($stmt = $this->Db->query($sql)) {
-				// Cycle through results
+			if ($stmt = $conn->query($sql)) {
 				while ($row = $stmt->fetch_assoc()){
 				 	$returnData[] = $row;
 				}
@@ -136,7 +237,7 @@ Class Query
 			}
 		}
 
-		return !empty($returnData) ? $returnData : true;
+		return $returnData;
 	}
 
 	/**
@@ -165,10 +266,14 @@ Class Query
 		$returnData = ['where'=>'', 'param' => []];
 		if (empty($this->_where)) return ['where'=>'', 'param' => []];
 
+		$orStatus = false;
 		foreach ($this->_where as $key => $value) {
+			$where = '';
+			$param = [];
 			if (is_array($value)) {
 				if (is_array($value[0])) { // OR 分组
 					$tempOrStr = '';
+					$orStatus = true;
 					foreach ($value as $k => $v) {
 						$tempCount = count($v);
 						if ($tempCount == 3) {
@@ -180,19 +285,20 @@ Class Query
 									$tempOrStr .= sprintf(' OR %s %s ?', $v[0], strtoupper($v[1]));
 									break;
 							}
-							$returnData['param'][] = is_array($v[2]) ? implode(',', $v[2]) : $v[2];
+							$param[] = is_array($v[2]) ? implode(',', $v[2]) : $v[2];
 						} else if (!empty($v[0]) && $tempCount == 2){ 
 							//默认 = 条件的
 							$tempOrStr .= ' OR '.$v[0].' = ?';
-							$returnData['param'][] = $v[1];
+							$param[] = $v[1];
 						} else { //键值对条件的
 							foreach ($v as $kk => $vv) { 
 								$tempOrStr .= ' OR '.$k.' = ?';
-								$returnData['param'][] = $v;
+								$param[] = $v;
 							}
 						}
 					}
-					$returnData['where'] .= ' AND ('.trim(trim(trim($tempOrStr), 'OR')).')';
+
+					$where = $tempOrStr;
 				} else {
 					$tempCount = count($value);
 					if ($tempCount == 3) {
@@ -203,33 +309,50 @@ Class Query
 									$inStr .= ' ? ,';
 								}
 								$inStr = trim(trim($inStr, ','));
-								$returnData['where'] .= sprintf(' AND %s %s (%s)', $value[0], strtoupper($value[1]), $inStr);
+								$where .= sprintf(' AND %s %s (%s)', $value[0], strtoupper($value[1]), $inStr);
 								break;
 							default:
-								$returnData['where'] .= sprintf(' AND %s %s ?', $value[0], strtoupper($value[1]));
+								$where .= sprintf(' AND %s %s ?', $value[0], strtoupper($value[1]));
 								break;
 						}
 
-						$returnData['param'] = array_merge($returnData['param'], is_array($value[2]) ? $value[2] : [$value[2]]);
+						$param = array_merge($param, is_array($value[2]) ? $value[2] : [$value[2]]);
 					} else if (!empty($value[0]) && $tempCount == 2){ //默认 = 条件的
-						$returnData['where'] .= ' AND '.$value[0].' = ?';
-						$returnData['param'][] = $value[1];
+						$where .= ' AND '.$value[0].' = ?';
+						$param[] = $value[1];
 					} else { //键值对条件的
 						foreach ($value as $k => $v) { 
-							$returnData['where'] .= ' AND '.$k.' = ?';
-							$returnData['param'][] = $v;
+							$where .= ' AND '.$k.' = ?';
+							$param[] = $v;
 						}
 					}
 				}
 			} else {
-				$returnData['where'] .= ' AND '.$key.' = ?';
-				$returnData['param'][] = $value;
+				$where .= ' AND '.$key.' = ?';
+				$param[] = $value;
 			}
+
+			if (empty($returnData['where']) && $orStatus) {
+				$returnData['where'] = trim(trim(trim($where), 'OR'));
+			} else if (!empty($returnData['where'])) {
+				if ($orStatus) {
+					$returnData['where'] = '('.trim(trim(trim($returnData['where']), 'AND')).')'.$where;
+				} else {
+					$returnData['where'] .= $where;
+					$orStatus = false;
+				}
+			} else {
+				$returnData['where'] .= $where;
+				$orStatus = false;
+			}
+
+			$returnData['param'] = array_merge($returnData['param'] ?? [], $param);
 		}
 
-		$returnData['where'] = trim(trim(trim($returnData['where']), 'AND'));
+		$this->_whereStr = trim(trim(trim($returnData['where']), 'AND'));
+		$this->_param = $returnData['param'] ?? [];
 
-		return $returnData;
+		return $this;
 	}
 
 	/**
