@@ -19,16 +19,6 @@ class IndexController
 
 	public function index()
 	{
-		print_r(\DB::connection('mysql')->table('user')->count());
-
-		print_r(\DB::connection('sys')->table('sys_config')->count());
-
-		print_r(\DB::connection('sys')->table('sys_config')->count());
-
-		dd(microtime(true) - APP_START_TIME);
-		\App::make('App\Http\Controllers\Home\IndexController');
-		\App::make('App\Http\Controllers\Home\IndexController');
-		dd(\Router::analyze_params());
 		echo '<div style="margin:0 auto;width:500px;"><h1>Welcome to om frame!</h1>
 					<p>If you see this page, the om frame is successfully installed and
 					working. Further configuration is required.</p>

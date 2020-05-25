@@ -16,11 +16,15 @@ class Connection
 	//定义私有的__clone()方法，确保单例类不能被复制或克隆
 	private function __clone() {}
 
-	private static function connect($host, $username, $password, $port = '3306', $charset='UTF8', $database = '')
+	/**
+	 * @method 数据库链接实例
+	 * @date   2020-05-25
+	 */
+	private static function connect($host, $username, $password, $port = '3306', $database = '', $charset='UTF8')
 	{
-		$conn =  new \mysqli($host, $username, $password, $database, $port);
+		$conn =  new mysqli($host, $username, $password, $database, $port);
 		if($conn->connect_error){
-			die('Connect Error ('.self::$_instance->connect_errno.') '.self::$_instance->connect_error);
+			throw new Exception('Connect Error ('.$conn->connect_errno.') '.$conn->connect_error, 1);
 		}
 
 		//设置字符集
@@ -29,26 +33,28 @@ class Connection
 		return $conn;
 	}
 
-	public static function getInstance($database = null) 
+	/**
+	 * @method 数据库链接单例方法
+	 * @date   2020-05-25
+	 */
+	public static function getInstance($db = null, $database = null) 
 	{
-		if (empty(self::$_instance[$database])) {
+		if (empty(self::$_instance[$db][$database])) {
 
-			if (empty($GLOBALS['database'])) throw new Exception("数据库连接失败： config/database 中 没有找到相关数据库配置");
+			$config = $GLOBALS['database'][$db] ?? [];
+			if (empty($config))
+				throw new Exception("Connect Error： Cannot found {$db} in config/database");
 
-			if (empty($database)) $database = 'default';
-
-			$host = 'localhost';
-			$username = 'root';
-			$password = '';
-			$port = '3306';
-			$database = $database;
-			$charset = '';
-
-			self::$_instance[$database] = self::connect($host, $username, $password, $port, $charset, $database);
+			self::$_instance[$db][$database] = self::connect(
+				$config['db_host'] ?? '', 
+				$config['db_user'] ?? '', 
+				$config['db_pass'] ?? '', 
+				$config['db_port'] ?? '', 
+				$config['db_name'] ?? '', 
+				$config['db_charset'] ?? ''
+			);
 		}
 
-		return self::$_instance[$database];
+		return self::$_instance[$db][$database];
 	}
 }
-
-?>

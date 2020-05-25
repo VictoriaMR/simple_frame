@@ -2,6 +2,7 @@
 
 Class Query
 {
+	public $_db = null;
 	public $_database = null;
 	public $_table = null;
 	protected $_columns = null;
@@ -163,7 +164,7 @@ Class Query
 	 */
 	public function getQuery($sql = '', $params = [])
 	{
-		$conn = Connection::getInstance($this->_database);
+		$conn = Connection::getInstance($this->_db, $this->_database);
 
 		$returnData = [];
 		if (empty($sql)) return $returnData;

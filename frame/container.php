@@ -79,7 +79,7 @@ final class Container
     {
         if (!empty(self::$building[$abstract]))
             return self::$building[$abstract];
-             
+     
         $concrete = $this->getConcrete($abstract);
 
         if ($this->isBuildable($concrete, $abstract)) {
@@ -120,15 +120,11 @@ final class Container
             return $concrete($this);
         }
 
-        if ($concrete == 'Connection') return false;
-
         //创建反射对象
         $reflector = new ReflectionClass($concrete);
 
         if( ! $reflector->isInstantiable()){
-            //抛出异常
-            // dd($concrete);
-            // throw new \Exception('无法实例化');
+            return $concrete;
         }
 
         $constructor = $reflector->getConstructor();
