@@ -1,5 +1,9 @@
 <?php
 
+//也可以在 index.php 定义一些自己的变量 | 设置
+header("Access-Control-Allow-Origin: *");
+@session_start();
+
 //定义一些常量参数
 define('APP_DEBUG', getenv('APP_DEBUG') ? true : false);
 define('IS_AJAX', false);

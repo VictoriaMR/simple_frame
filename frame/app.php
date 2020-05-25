@@ -44,7 +44,7 @@ class App
 		$info = Router::analyze_func();
 		$class = 'App\\Http\\Controllers\\'.$info['Class'].'\\'.$info['ClassPath'].'Controller';
 
-		App\Http\Middleware\VerifyToken::handle($info);
+		\App\Http\Middleware\VerifyToken::handle($info);
 
 		call_user_func_array([self::autoload($class), $info['Func']], Router::analyze_params());
 	}
