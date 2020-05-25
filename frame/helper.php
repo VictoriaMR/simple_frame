@@ -37,3 +37,10 @@ function isMobile()
 
 	return false;
 }
+
+//数据库函数
+function DB($db = null)
+{
+	$Db = new DB($db);
+	return $Db;
+}
