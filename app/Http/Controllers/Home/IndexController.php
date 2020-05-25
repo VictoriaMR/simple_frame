@@ -21,9 +21,9 @@ class IndexController
 	{
 		print_r(\DB::connection('mysql')->table('user')->count());
 
-		print_r(\DB::connection('sys')->table('sys_config')->count());
+		// print_r(\DB::connection('sys')->table('sys_config')->count());
 
-		print_r(\DB::connection('sys')->table('sys_config')->count());
+		// print_r(\DB::connection('sys')->table('sys_config')->count());
 
 		dd(microtime(true) - APP_START_TIME);
 		\App::make('App\Http\Controllers\Home\IndexController');

@@ -41,10 +41,12 @@ class App
 	public function send() 
 	{
 		//路由解析
-		$Info = Router::analyze_func();
-		$class = 'App\\Http\\Controllers\\'.$Info['Class'].'\\'.$Info['ClassPath'].'Controller';
+		$info = Router::analyze_func();
+		$class = 'App\\Http\\Controllers\\'.$info['Class'].'\\'.$info['ClassPath'].'Controller';
 
-		call_user_func_array([self::autoload($class), $Info['Func']], Router::analyze_params());
+		App\Http\Middleware\VerifyToken::handle($info);
+
+		call_user_func_array([self::autoload($class), $info['Func']], Router::analyze_params());
 	}
 
 	/**

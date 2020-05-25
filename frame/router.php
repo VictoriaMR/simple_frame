@@ -9,12 +9,6 @@ class Router
      */
     public static function analyze_func()
 	{
-		/**
-		 * URL
-		 * 1、part/show?name=abc 
-		 * 2、path/part/show/abc/?name=abc
-		 * 3、en/path/part/show/abc/?name=abc
-		 */
         $pathInfo = trim(str_replace('.html', '', $_SERVER['PATH_INFO'] ?? ''), '/');
 
 		/* 对Url网址进行拆分 */
