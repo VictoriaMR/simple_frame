@@ -19,6 +19,9 @@ class IndexController
 
 	public function index()
 	{
+		print_r(number_format((memory_get_usage() - MEM0RY_START) / 1024, 2));
+		print_r(get_included_files());die();
+
 		echo '<div style="margin:0 auto;width:500px;"><h1>Welcome to om frame!</h1>
 					<p>If you see this page, the om frame is successfully installed and
 					working. Further configuration is required.</p>

@@ -1,18 +1,20 @@
 <?php
 
-//也可以在 index.php 定义一些自己的变量 | 设置
-header("Access-Control-Allow-Origin: *");
-@session_start();
 
 //定义一些常量参数
 define('APP_DEBUG', getenv('APP_DEBUG') ? true : false);
 define('IS_AJAX', false);
 define('IS_MOBILE', false);
+define('MEM0RY_START', memory_get_usage());
+
+//也可以在 index.php 定义一些自己的变量 | 设置
+header("Access-Control-Allow-Origin: *");
+@session_start();
 
 //加载 composer 配置文件
-if (is_file(ROOT_PATH . 'vendor/autoload.php')) {
-	require_once ROOT_PATH . 'vendor/autoload.php';
-} 
+// if (is_file(ROOT_PATH . 'vendor/autoload.php')) {
+// 	require_once ROOT_PATH . 'vendor/autoload.php';
+// } 
 
 //配置文件
 if (is_file(ROOT_PATH . 'frame/env.php')) {
@@ -28,14 +30,6 @@ if (is_file(ROOT_PATH . 'frame/config.php')) {
 if (is_file(ROOT_PATH . 'frame/helper.php')) {
 	require_once ROOT_PATH . 'frame/helper.php';
 }
-
-//路由文件
-if (is_file(ROOT_PATH . 'frame/router.php')) {
-	require_once ROOT_PATH . 'frame/router.php';
-}
-
-//容器
-require_once ROOT_PATH . 'frame/container.php';
 
 //框架 APP 文件
 require_once ROOT_PATH . 'frame/app.php';
