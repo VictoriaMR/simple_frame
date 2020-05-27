@@ -1,3 +1,7 @@
 <?php 
 
-return ['home', 'admin', 'api'];
+return [
+	'home', 
+	'admin', 
+	'api',
+];

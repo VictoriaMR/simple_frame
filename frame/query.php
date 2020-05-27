@@ -2,6 +2,7 @@
 
 Class Query
 {
+	private static $_instance = null;
 	public $_db = null;
 	public $_database = null;
 	public $_table = null;
@@ -13,6 +14,14 @@ Class Query
 	protected $_orderBy = '';
 	protected $_offset = 0;
 	protected $_limit = 0;
+
+	public static function getInstance($db = null) 
+    {
+        if (!self::$_instance instanceof self) {
+            self::$_instance = new self();
+        }
+        return self::$_instance;
+    }
 
 	public function table($table = '')
 	{

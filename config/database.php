@@ -1,11 +1,6 @@
 <?php
 
-/**
- * 储存库的配置
- */
 return [
-
-	//main database
 	'default' => [
 		'db_host'	 => getenv('DB_HOST', '127.0.0.1'), 	//地址
 		'db_port'	 => getenv('DB_PORT', '3306'),        	//端口

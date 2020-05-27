@@ -24,9 +24,7 @@ function isMobile()
 		if (preg_match("/(" . implode('|', $clientKeywords) . ")/i", strtolower($_SERVER['HTTP_USER_AGENT']))) return true;
 	}
 
-	//协议法，因为有可能不准确，放到最后判断
-	// 如果只支持wml并且不支持html那一定是移动设备
-	// 如果支持wml和html但是wml在html之前则是移动设备
+	//协议法，因为有可能不准确，放到最后判断 如果只支持wml并且不支持html那一定是移动设备 如果支持wml和html但是wml在html之前则是移动设备
 	if (isset($_SERVER['HTTP_ACCEPT'])) {
 		if ((strpos($_SERVER['HTTP_ACCEPT'], 'vnd.wap.wml') !== false) 
 			&& (strpos($_SERVER['HTTP_ACCEPT'], 'text/html') === false 
@@ -41,6 +39,29 @@ function isMobile()
 //数据库函数
 function DB($db = null)
 {
-	$Db = new DB($db);
-	return $Db;
+	return DB::getInstance($db);
+}
+
+/*
+ * 视图助手函数 display
+ */
+function view($template = '')
+{
+	return View::getInstance()->display($template);
+}
+
+/*
+ * 视图助手函数 fetch
+ */
+function fetch($template = '')
+{
+	return View::getInstance()->fetch($template);
+}
+
+/*
+ * 视图助手函数 assign
+ */
+function assign($name, $value = null)
+{
+	return View::getInstance()->assign($name, $value);
 }

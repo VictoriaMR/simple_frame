@@ -19,6 +19,12 @@ class IndexController
 
 	public function index()
 	{
+		assign('data', time());
+
+		return view();
+
+		// die();
+
 		print_r(number_format((memory_get_usage() - MEM0RY_START) / 1024, 2));
 		print_r(get_included_files());die();
 

@@ -47,6 +47,8 @@ class App
 		\App\Http\Middleware\VerifyToken::handle($info);
 
 		call_user_func_array([self::autoload($class), $info['Func']], Router::analyze_params());
+
+		self::debugModeInit();
 	}
 
 	/**
@@ -98,5 +100,75 @@ class App
     public static function make($abstract)
     {
     	return self::autoload($abstract);
-    }	
+    }
+
+    /**
+     * 调试模式设置
+     * @access protected
+     * @return void
+     */
+    protected static function debugModeInit()
+    {
+        // 应用调试模式
+        if (!getenv('APP_DEBUG')) return false;
+
+        // 获取基本信息
+        $runtime = number_format(microtime(true) - APP_START_TIME, 10, '.', '');
+        $reqs    = $runtime > 0 ? number_format(1 / $runtime, 2) : '∞';
+        $mem     = number_format((memory_get_usage() - MEM0RY_START) / 1024, 2);
+
+        $uri = implode(' ', [
+        	$_SERVER['SERVER_PROTOCOL'],
+        	$_SERVER['REQUEST_METHOD'],
+        	$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],
+        ]);
+
+        $base = [
+            '请求信息' => date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']) . ' ' . $uri,
+            '运行时间' => number_format((float) $runtime, 6) . 's [ 吞吐率：' . $reqs . 'req/s ] 内存消耗：' . $mem . 'kb 文件加载：' . count(get_included_files()),
+            '查询信息' => '',
+            '缓存信息' => '',
+        ];
+
+        $info = get_included_files();
+
+        foreach ($info as $key => $file) {
+            $info[$key] .= ' ( ' . number_format(filesize($file) / 1024, 2) . ' KB )';
+        }
+
+        $config = [
+	        'file' => '',
+	        'tabs' => ['base' => '基本', 'file' => '文件', 'info' => '流程', 'notice|error' => '错误', 'sql' => 'SQL'],
+	    ];
+
+        $trace = [];
+        foreach ($config['tabs'] as $name => $title) {
+            $name = strtolower($name);
+            switch ($name) {
+                case 'base': // 基本信息
+                    $trace[$title] = $base;
+                    break;
+                case 'file': // 文件信息
+                    $trace[$title] = $info;
+                    break;
+                default: // 调试信息
+                    if (strpos($name, '|')) {
+                        // 多组信息
+                        $names  = explode('|', $name);
+                        $result = [];
+                        foreach ($names as $item) {
+                            $result = array_merge($result, $log[$item] ?? []);
+                        }
+                        $trace[$title] = $result;
+                    } else {
+                        $trace[$title] = $log[$name] ?? '';
+                    }
+            }
+        }
+
+        assign('trace', $trace);
+        assign('runtime', $runtime);
+
+        echo fetch('frame/pagetrace');
+    }
 }
