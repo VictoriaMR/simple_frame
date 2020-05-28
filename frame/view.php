@@ -20,18 +20,45 @@ class View
 
     public function display($template = '')
     {
-        if (empty($template))
-            $template = 'view/'.implode('/', Router::analyze_func());
+        $template = $this->getTemplate($template);
 
-        $tplFile = ROOT_PATH . $template . '.php';
-
-        if (!file_exists($tplFile)) {
-            throw new Exception($tplFile . ' 模板不存在', 1);
+        if (!file_exists($template)) {
+            throw new Exception($template . ' 模板不存在', 1);
         }
 
         extract($this->data);
 
-        include($tplFile);
+        include($template);
+    }
+
+    private function getTemplate($template) 
+    {
+        if (!empty($template)) {
+            if (false === strrpos($template, '/')) {
+                $template = \Router::realFunc(explode('.', $template));
+                $temp = Router::getFunc();
+                switch (count($template)) {
+                    case 1:
+                        $temp['Func'] = $template[0] ?? 'index';
+                        break;
+                    case 2:
+                        $temp['Func'] = $template[1] ?? 'index';
+                        $temp['ClassPath'] = $template[0] ?? 'Index';
+                        break;
+                    default:
+                        $temp['Class'] = array_shift($template);
+                        $temp['Func'] = array_pop($template);
+                        $temp['ClassPath'] = implode('/', $template);
+                        break;
+                }
+
+                $template = 'view/' . (isMobile() ? 'mobile' : 'computer') . '/' . implode('/', $temp);
+            }
+        } else {
+            $template = 'view/' . (isMobile() ? 'mobile' : 'computer') . '/' . implode('/', \Router::getFunc());
+        }
+
+        return ROOT_PATH . $template . '.php';
     }
 
     public function fetch($template = '', $cachelate = '')
@@ -46,7 +73,7 @@ class View
 
         }
 
-        return $content;
+        echo $content;
     }
 
     public function assign($name, $value = null)

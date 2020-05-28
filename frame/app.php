@@ -3,7 +3,7 @@
 class App 
 {
 	private static $class = null;
-	private static $instance = null;
+	private static $_instance = null;
 	const VERSION = '5.1.0';
 	private static $autoload = [];
 
@@ -15,23 +15,27 @@ class App
         return static::VERSION;
     }
 
+    public static function instance() 
+    {
+    	if (!(self::$_instance instanceof self)) {
+			self::$_instance = new self();
+		}
+
+		return self::$_instance;
+    }
+
 	/**
 	 * 框架初始化方法 运行方法的实例化 路由解析等
 	 */
 	public static function run() 
 	{
-		/**
-		 * 初始化实例
-		 */
-		if (!(self::$instance instanceof self)) {
-			self::$instance = new self();
-			self::$autoload = $GLOBALS['autoload'] ?? [];
-		}
-
 		//初始化方法
 		self::init();
 
-		return self::$instance;
+		//解析路由
+		Router::analyze_func();
+
+		return self::instance();
 	}
 
 	/**
@@ -41,7 +45,8 @@ class App
 	public function send() 
 	{
 		//路由解析
-		$info = Router::analyze_func();
+		$info = Router::$_route;
+
 		$class = 'App\\Http\\Controllers\\'.$info['Class'].'\\'.$info['ClassPath'].'Controller';
 
 		\App\Http\Middleware\VerifyToken::handle($info);

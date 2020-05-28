@@ -21,6 +21,8 @@ class IndexController
 	{
 		assign('data', time());
 
+		// go('login');
+
 		return view();
 
 		// die();
@@ -35,5 +37,10 @@ class IndexController
 					<a href="https://github.com/VictoriaMR/onlyMySQL-Frame">onlyMySQL-Frame</a>.<br/>
 
 					<p><em>Thank you for using om frame.</em></p></div>';
+	}
+
+	public function login()
+	{
+		dd(__FUNCTION__);
 	}
 }

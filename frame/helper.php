@@ -65,3 +65,15 @@ function assign($name, $value = null)
 {
 	return View::getInstance()->assign($name, $value);
 }
+
+/*
+ * 跳转助手函数 home.index.login
+ */
+function go($func = '')
+{
+	$func = explode('.', $func);
+
+	Router::reload($func);
+
+	App::instance()->send();
+}

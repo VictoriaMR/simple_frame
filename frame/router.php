@@ -2,6 +2,8 @@
 
 class Router
 {	
+	public static $_route = [];
+
 	/**
      * @method 解析网址 解析成路由和参数 返回控制器执行路径 
      *         可自己定义控制器路径
@@ -33,25 +35,60 @@ class Router
         $ClassPath = implode('/', $pathInfoArr);
 
         $funcArr = [
-			'Class'     => !empty($Class) ? $Class : 'home',
-			'ClassPath' => !empty($ClassPath) ? $ClassPath : 'index',
+			'Class'     => !empty($Class) ? $Class : 'Home',
+			'ClassPath' => !empty($ClassPath) ? $ClassPath : 'Index',
 			'Func'      => !empty($Func) ? $Func : 'index',
 		];
 
-		return self::realFunc($funcArr);
+		self::$_route = self::realFunc($funcArr);
 	}
 
-	private static function realFunc($funcArr)
+	public static function getFunc()
+	{
+		return self::$_route;
+	}
+
+	public static function realFunc($funcArr)
 	{
 		if (!empty($funcArr)) {
+			$count = count($funcArr);
+			$i = 1;
 			foreach ($funcArr as $key => $value) {
 				if (empty($value)) continue;
-
-				$funcArr[$key] = strtoupper(substr($value, 0, 1)) . substr($value, 1);
+				if ($count == $i) {
+					//方法名小写
+					$funcArr[$key] = strtolower(substr($value, 0, 1)) . substr($value, 1);
+				} else {
+					$funcArr[$key] = strtoupper(substr($value, 0, 1)) . substr($value, 1);
+					$i ++;
+				}
 			}
 		}
 
 		return $funcArr;
+	}
+
+	public static function reload($funcArr = [])
+	{
+		if (empty($funcArr))
+			return false;
+
+		$funcArr = self::realFunc($funcArr);
+
+		switch (count($funcArr)) {
+			case 1:
+				self::$_route['Func'] = $funcArr[0] ?? 'index';
+				break;
+			case 2:
+				self::$_route['Func'] = $funcArr[1] ?? 'index';
+				self::$_route['ClassPath'] = $funcArr[0] ?? 'Index';
+				break;
+			default:
+				self::$_route['Class'] = array_shift($funcArr);
+                self::$_route['Func'] = array_pop($funcArr);
+                self::$_route['ClassPath'] = implode('\\', $funcArr);
+				break;
+		}
 	}
 
 	public static function analyze_params()
