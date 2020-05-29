@@ -36,7 +36,7 @@ class View
         if (!empty($template)) {
             if (false === strrpos($template, '/')) {
                 $template = \Router::realFunc(explode('.', $template));
-                $temp = Router::getFunc();
+                $temp = \Router::getFunc();
                 switch (count($template)) {
                     case 1:
                         $temp['Func'] = $template[0] ?? 'index';

@@ -2,10 +2,11 @@
 
 class Router
 {	
-	public static $_route = [];
+	public static $_route = []; //路由
+	public static $_param = []; //参数
 
 	/**
-     * @method 解析网址 解析成路由和参数 返回控制器执行路径 
+     * @method 解析网址 解析路由 返回控制器执行路径 
      *         可自己定义控制器路径
      * @return array
      */

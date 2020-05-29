@@ -77,3 +77,12 @@ function go($func = '')
 
 	App::instance()->send();
 }
+
+/**
+ * 是否运行在命令行下
+ * @return bool
+ */
+function runningInConsole()
+{
+    return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
+}

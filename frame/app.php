@@ -2,10 +2,8 @@
 
 class App 
 {
-	private static $class = null;
 	private static $_instance = null;
 	const VERSION = '5.1.0';
-	private static $autoload = [];
 
 	/**
      * 版本号
@@ -34,6 +32,9 @@ class App
 
 		//解析路由
 		Router::analyze_func();
+
+        //注册异常处理
+        Erroring::register();
 
 		return self::instance();
 	}
@@ -73,22 +74,18 @@ class App
 	 */
 	protected static function autoload($abstract) 
     {
-    	if (!empty(self::$autoload[$abstract])) {
-    		$abstract = self::$autoload[$abstract];
-    	}
-
-    	if (strtolower(substr($abstract, 0, 3)) != 'app') {
-    		$fileName = 'frame/'.$abstract;
+    	if (!empty($GLOBALS['autoload']) && !empty($GLOBALS['autoload'][$abstract])) {
+    		$fileName = $GLOBALS['autoload'][$abstract];
     	} else {
     		$fileName = $abstract;
     	}
 
-        $abstractfile = ROOT_PATH . str_replace(['\\', 'App/'], ['/', 'app/'], $fileName) . '.php';
+        $fileName = ROOT_PATH . str_replace(['\\', 'App/'], ['/', 'app/'], $fileName) . '.php';
 
-        if (is_file($abstractfile)){
-			require_once $abstractfile;
+        if (is_file($fileName)){
+			require_once $fileName;
 		} else {
-			throw new Exception( $abstractfile .' was not exist!');
+			throw new Exception( $abstract .' was not exist!', 0);
 		}
 
         $concrete = Container::getInstance()->autoload($abstract);
