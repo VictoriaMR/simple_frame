@@ -128,18 +128,21 @@ class App
         	$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],
         ]);
 
+        $info = get_included_files();
+        $fileMem = 0;
+        foreach ($info as $key => $file) {
+            $temp = number_format(filesize($file) / 1024, 2);
+            $fileMem += $temp;
+            $info[$key] .= ' ( ' . $temp . ' KB )';
+        }
+
         $base = [
             '请求信息' => date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']) . ' ' . $uri,
-            '运行时间' => number_format((float) $runtime, 6) . 's [ 吞吐率：' . $reqs . 'req/s ] 内存消耗：' . $mem . 'kb 文件加载：' . count(get_included_files()),
+            '运行时间' => number_format((float) $runtime, 6) . 's [ 吞吐率：' . $reqs . ' req/s ] 内存消耗：' . $mem . ' KB 文件加载：' . count($info),
             '查询信息' => '',
             '缓存信息' => '',
+            '文件总值' => $fileMem . ' KB',
         ];
-
-        $info = get_included_files();
-
-        foreach ($info as $key => $file) {
-            $info[$key] .= ' ( ' . number_format(filesize($file) / 1024, 2) . ' KB )';
-        }
 
         $config = [
 	        'file' => '',
