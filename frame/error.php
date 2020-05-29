@@ -20,9 +20,10 @@ class Erroring
 		}
     }
 
-    public static function error_debug()
+    public static function error_debug($errno, $errStr, $errfile = '', $errline = '')
     {
-    	self::catch_error_debug();
+    	$msg = sprintf('<div>[%s]</div> <div> %s </div> <div> 第 %s 行 </div> <div> 错误: %s </div><br />', date( "Y-m-d H:i:s" ), $errfile, $errline, $errStr);
+    	self::error_echo($msg);
     }
 
     public static function exception_debug($exception)
