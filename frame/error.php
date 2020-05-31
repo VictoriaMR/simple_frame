@@ -10,13 +10,13 @@ class Erroring
     {
 
         if (getenv('APP_DEBUG')) {
-	    	set_error_handler([__CLASS__, 'error_debug']);
-	        set_exception_handler([__CLASS__, 'exception_debug']);
-			register_shutdown_function([__CLASS__, 'shutdown_debug']);
 			error_reporting(E_ALL & ~ E_NOTICE);
+	    	// set_error_handler([__CLASS__, 'error_debug']);
+	        // set_exception_handler([__CLASS__, 'exception_debug']);
+			register_shutdown_function([__CLASS__, 'shutdown_debug']);
 		} else {
-			register_shutdown_function([__CLASS__, 'catch_error']);
 			error_reporting(0);
+			register_shutdown_function([__CLASS__, 'catch_error']);
 		}
     }
 
@@ -29,8 +29,9 @@ class Erroring
     public static function exception_debug($exception)
     {
     	$msg = sprintf('<div>[%s]</div> <div> %s </div> <div> 第 %s 行 </div> <div> 错误: %s </div><br />', date( "Y-m-d H:i:s" ), $exception->getFile(), $exception->getLine(), $exception->getMessage());
+    	dd($exception->getTrace());
     	foreach ($exception->getTrace() as $key => $value) {
-    		$msg .= '<div>'.sprintf(' %s, 第 %s 行', $value['file'], $value['line']).'</div>';
+    		$msg .= '<div>'.sprintf(' %s, 第 %s 行', $value['file'] ?? '', $value['line']).'</div>';
     	}
     	self::error_echo($msg);
     }
@@ -69,8 +70,7 @@ class Erroring
 	 */
 	public static function catch_error()
 	{
-		$_error = error_get_last();
-		$msg = sprintf('[%s] file:%s, line:%s, msg:%s', date( "Y-m-d H:i:s" ), $_error['file'], $_error['line'], $_error['message']);
-		self::error_echo($msg);
+		echo '404';
+		exit();
 	}
 }

@@ -52,9 +52,14 @@ class App
 
 		\App\Http\Middleware\VerifyToken::handle($info);
 
-		call_user_func_array([self::autoload($class), $info['Func']], Router::analyze_params());
+		call_user_func_array([self::autoload($class), $info['Func']], []);
 
-		self::debugModeInit();
+         // 应用调试模式
+        if (getenv('APP_DEBUG')) {
+            self::debugModeInit();
+        }
+
+        exit();
 	}
 
 	/**
@@ -101,7 +106,7 @@ class App
      */
     public static function make($abstract)
     {
-    	return self::autoload($abstract);
+    	return self::autoload(str_replace('/', '\\', $abstract));
     }
 
     /**
@@ -111,9 +116,6 @@ class App
      */
     protected static function debugModeInit()
     {
-        // 应用调试模式
-        if (!getenv('APP_DEBUG')) return false;
-
         // 获取基本信息
         $runtime = number_format(microtime(true) - APP_START_TIME, 10, '.', '');
         $reqs    = $runtime > 0 ? number_format(1 / $runtime, 2) : '∞';

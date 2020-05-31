@@ -1,5 +1,7 @@
 <?php
 
+namespace frame;
+
 class DB
 {
 	private static $_instance = null;

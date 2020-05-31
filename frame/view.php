@@ -86,4 +86,17 @@ class View
 
         return $this;
     }
+
+    public static function load($template = '')
+    {
+        if (empty($template)) return false;
+
+        $template = self::getInstance()->getTemplate($template);
+
+        if (!file_exists($template)) {
+            throw new Exception($template . ' 模板不存在', 1);
+        }
+
+        include($template);
+    }
 }

@@ -1,5 +1,7 @@
 <?php
 
+namespace frame;
+
 Class Query
 {
 	private static $_instance = null;
@@ -15,7 +17,7 @@ Class Query
 	protected $_offset = 0;
 	protected $_limit = 0;
 
-	public static function getInstance($db = null) 
+	public static function getInstance() 
     {
         if (!self::$_instance instanceof self) {
             self::$_instance = new self();
@@ -26,7 +28,7 @@ Class Query
 	public function table($table = '')
 	{
 		if (empty($table))
-			throw new Exception('MySQL SELECT QUERY, table can not be empty!', 1);
+			throw new \Exception('MySQL SELECT QUERY, table can not be empty!', 1);
 
 		$this->_table = $table;
 
@@ -108,9 +110,8 @@ Class Query
 
 	public function find()
 	{
-		$this->_offset = 1;
+		$this->_offset = 0;
 		$this->_limit = 1;
-
 		return $this->getResult()[0] ?? [];
 	}
 
@@ -118,7 +119,7 @@ Class Query
 	{
 		$this->_columns = ['COUNT(*) as count'];
 		$this->_offset = 0;
-		$this->_limit = 0;
+		$this->_limit = 1;
 
 		$result = $this->getResult();
 
@@ -128,14 +129,13 @@ Class Query
 	public function getResult()
 	{
 		$sql = $this->getSql();
-
 		return $this->getQuery($sql, $this->_param);
 	}
 
 	public function getSql()
 	{
 		if (empty($this->_table)) {
-			throw new Exception('MySQL SELECT QUERY, table not exist!', 1);
+			throw new \Exception('MySQL SELECT QUERY, table not exist!', 1);
 		}
 
 		//解析条件
@@ -155,12 +155,12 @@ Class Query
 			$sql .= ' ORDER BY ' . $this->_orderBy;
 		}
 
-		if (!empty($this->_offset)) {
-			$sql .= ' LIMIT ' . $this->_offset;
+		if ($this->_offset !== null) {
+			$sql .= ' LIMIT ' . (int) $this->_offset;
 		}
 
-		if (!empty($this->_limit)) {
-			$sql .= ',' . $this->_limit;
+		if ($this->_limit !== null ) {
+			$sql .= ',' . (int) $this->_limit;
 		}
 
 		return $sql;
@@ -173,7 +173,7 @@ Class Query
 	 */
 	public function getQuery($sql = '', $params = [])
 	{
-		$conn = Connection::getInstance($this->_db, $this->_database);
+		$conn = \frame\Connection::getInstance($this->_db, $this->_database);
 
 		$returnData = [];
 		if (empty($sql)) return $returnData;
@@ -227,13 +227,13 @@ Class Query
 				        }
 		        	}
 		        } else {
-		        	throw new Exception('SQL 参数设置错误!');
+		        	throw new \Exception('SQL 参数设置错误!');
 		        }
 
 			    $stmt->free_result();
 			    $stmt->close();
 			} else {
-				throw new Exception($sql . ' SQL 错误!');
+				throw new \Exception($sql . ' SQL 错误!');
 			}
 		} else {
 			if ($stmt = $conn->query($sql)) {

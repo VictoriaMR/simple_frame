@@ -2,6 +2,8 @@
 
 namespace App\Http\Middleware;
 
+use frame\Session;
+
 /**
  * 验证token.
  */
@@ -13,7 +15,7 @@ class VerifyToken
      * @var array
      */
     protected static $except = [
-        'Admin/Index/loginIn',
+        'Admin/Index/login',
     ];
 
     protected static $exceptNotToken = [
@@ -30,16 +32,17 @@ class VerifyToken
      */
     public static function handle($request)
     {
-        $param = array_pop($request);
-        $route = implode('//', $request);
+        $route = implode('/', $request);
 
         if (self::inExceptArray($route)) {
             return true;
-        }
+        } 
 
         switch ($request['Class']) {
             case 'Admin':
-                // dd($_SESSION);
+                if (!Session::login('admin')) {
+                    go('login');
+                }
                 break;
             
             default:

@@ -1,5 +1,7 @@
 <?php
 
+namespace frame;
+
 class Connection
 {
 	private $conn = null;
@@ -22,9 +24,9 @@ class Connection
 	 */
 	private static function connect($host, $username, $password, $port = '3306', $database = '', $charset='UTF8')
 	{
-		$conn =  new mysqli($host, $username, $password, $database, $port);
+		$conn =  new \mysqli($host, $username, $password, $database, $port);
 		if($conn->connect_error){
-			throw new Exception('Connect Error ('.$conn->connect_errno.') '.$conn->connect_error, 1);
+			throw new \Exception('Connect Error ('.$conn->connect_errno.') '.$conn->connect_error, 1);
 		}
 
 		//设置字符集
@@ -39,11 +41,14 @@ class Connection
 	 */
 	public static function getInstance($db = null, $database = null) 
 	{
+		if ($db === null) $db = 'default';
+		if ($database === null) $database = getenv('DB_DATABASE');
+
 		if (empty(self::$_instance[$db][$database])) {
 
 			$config = $GLOBALS['database'][$db] ?? [];
 			if (empty($config))
-				throw new Exception("Connect Error： Cannot found {$db} in config/database");
+				throw new \Exception("Connect Error： Cannot found {$db} in config/database");
 
 			self::$_instance[$db][$database] = self::connect(
 				$config['db_host'] ?? '', 

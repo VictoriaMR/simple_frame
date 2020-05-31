@@ -90,29 +90,7 @@ class Router
                 self::$_route['ClassPath'] = implode('\\', $funcArr);
 				break;
 		}
-	}
 
-	public static function analyze_params()
-	{
-		$params = [];
-
-		if (!empty($_SERVER['QUERY_STRING']))
-		{
-			/* 初始化传参数组 */
-			/* 对传参字符进行拆分 */
-			$queryStrArr = explode( '&', trim( $_SERVER['QUERY_STRING'], '&' ) );
-			foreach( $queryStrArr as $v ) 
-			{
-				$tmp = explode( '=', $v );
-				if (empty($tmp)) continue;
-				$params[$tmp[0]] = urldecode($tmp[1] ?? '');
-			}
-		}
-
-		if (!empty($_REQUEST)) {
-			$params = array_merge($params, $_REQUEST);
-		}
-
-		return $params;
+		return true;
 	}
 }
