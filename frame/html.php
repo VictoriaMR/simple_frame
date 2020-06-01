@@ -22,7 +22,7 @@ class Html
 
 		$name = getenv('APP_DOMAIN') . 'js/' . $name . '.js';
 
-		self::$_Js[] = $name;
+		self::$_JS[] = $name;
 	}
 
 	public static function getCss()
@@ -34,8 +34,8 @@ class Html
 
 	public static function getJs()
 	{
-		if (empty(self::$_Js)) return [];
+		if (empty(self::$_JS)) return [];
 
-		return array_unique(self::$_Js);
+		return array_unique(self::$_JS);
 	}
 }

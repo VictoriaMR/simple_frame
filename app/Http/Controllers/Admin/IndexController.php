@@ -26,6 +26,7 @@ class IndexController extends Controller
 		$attachmentService = \App::make('App/Services/AttachmentService');
 
 		$data = $attachmentService->getListByTypeOne($attachmentService::constant('TYPE_ADMIN_LOGIN_BACKGROUD'));
+		
 		assign(['bg_img' => $data['url']]);
 		view();
 	}

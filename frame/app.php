@@ -1,5 +1,7 @@
 <?php
 
+use frame\Html;
+
 class App 
 {
 	private static $_instance = null;
@@ -35,6 +37,10 @@ class App
 
         //注册异常处理
         Erroring::register();
+
+        //引入公共css js
+        Html::addCss('common');
+        Html::addJs('jquery-3.5.1.min');
 
 		return self::instance();
 	}
