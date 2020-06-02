@@ -9,24 +9,7 @@
 	width:100%;
 }
 
-.iconfont {
-     font-family: iconfont!important; 
-     font-size: 16px; 
-     font-style: normal; 
-     -webkit-font-smoothing: antialiased; 
-    -moz-osx-font-smoothing: grayscale;
-}
 
-.iconfont {
-    position: absolute;
-    right: 5px;
-    top: 5px;
-    font-size: 52px;
-    line-height: 52px;
-    cursor: pointer;
-    color: #f40;
-}
-
-.icon-qrcode:before {
-    content: "\E628";
+.login-box {
+	
 }
