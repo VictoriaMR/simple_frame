@@ -40,6 +40,7 @@ class App
 
         //引入公共css js
         Html::addCss('common');
+        Html::addCss('font');
         Html::addJs('jquery-3.5.1.min');
 
 		return self::instance();

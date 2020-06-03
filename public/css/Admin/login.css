@@ -9,7 +9,17 @@
 	width:100%;
 }
 
-
 .login-box {
-	
+    width: 350px;
+    height: 350px;
+    padding: 25px;
+    color: #6c6c6c;
+    background: #fff;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    margin-top: -200px;
+    margin-left: -200px;
+    box-shadow: 4px 4px 10px #333333;
+    border: 1px solid #ccc;
 }
