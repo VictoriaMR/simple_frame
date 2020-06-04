@@ -23,5 +23,9 @@
 		<div class="btn font-16 font-600 pointer">登录</div>
 	</form>
 </div>
-
+<script>
+$(document).ready(function(){
+	LOGIN.init();
+});
+</script>
 <?php $this->load('Common.baseFooter');?>

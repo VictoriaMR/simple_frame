@@ -66,3 +66,16 @@
     right: 50px;
     top: 4px;
 }
+
+.poptip-content:after {
+    content: '';
+    position: absolute;
+    top: 9px;
+    right: -6px;
+    width: 9px;
+    height: 9px;
+    border-top: 1px solid #f3d995;
+    border-right: 1px solid #f3d995;
+    transform: rotate(45deg);
+    background: #fefcee;
+}

@@ -22,6 +22,7 @@ class IndexController extends Controller
 	public function login()
 	{
 		Html::addCss('admin/login');
+		Html::addJs('admin/login');
 
 		$attachmentService = \App::make('App/Services/AttachmentService');
 
