@@ -15,7 +15,7 @@ class VerifyToken
      * @var array
      */
     protected static $except = [
-        'Admin/Index/login',
+        'Admin/Login/index',
     ];
 
     protected static $exceptNotToken = [
@@ -41,7 +41,7 @@ class VerifyToken
         switch ($request['Class']) {
             case 'Admin':
                 if (!Session::login('admin')) {
-                    go('login');
+                    go('login.index');
                 }
                 break;
             
