@@ -79,3 +79,15 @@
     transform: rotate(45deg);
     background: #fefcee;
 }
+
+#login-error {
+	border: 1px solid #ff934c;
+    border-color: #ffb4a8;
+    background-color: #fef2f2;
+    height: 28px;
+    line-height: 28px;
+    padding: 0 8px;
+    position: absolute;
+    width: calc(100% - 18px);
+    top: 20px;
+}
