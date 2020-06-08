@@ -1,19 +1,19 @@
 var API = {
 	get: function(url, param, callback) {
 		$.get(url, param, function(res) {
-			if (callback) callback();
+			if (callback) callback(res);
 		}, 'json');
 	},
 	post: function(url, param, callback) {
 		$.post(url, param, function(res) {
-			if (callback) callback();
+			if (callback) callback(res);
 		}, 'json');
 	},
 };
 
 var VERIFY = {
 	phone: function (phone) {
-		var reg = /^1\d{10}/;
+		var reg = /^1[3456789]\d{9}$/;
 		return VERIFY.check(phone, reg);
 	},
 	email: function (email) {

@@ -14,3 +14,6 @@
     <?php }?>
 </head>
 <body>
+<script type="text/javascript">
+var ADMIN_URL = "<?php echo getenv('APP_DOMAIN').'admin/';?>";
+</script>

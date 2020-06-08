@@ -17,7 +17,10 @@ class IndexController extends Controller
 		# code...
 	}
 
-	
+	public function index() 
+	{
+		// dd(12312);
+	}
 
 	public function login()
 	{

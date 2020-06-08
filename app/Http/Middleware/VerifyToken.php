@@ -16,6 +16,7 @@ class VerifyToken
      */
     protected static $except = [
         'Admin/Login/index',
+        'Admin/Login/login',
     ];
 
     protected static $exceptNotToken = [

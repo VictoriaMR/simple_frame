@@ -73,3 +73,23 @@ function runningInConsole()
 {
     return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
 }
+
+function ipost($name = '', $default = '') 
+{
+    if (empty($name)) return $_POST;
+    
+    if (isset($_POST[$name]))
+        return  $_POST[$name];
+
+    return $default;
+}
+
+function iget($name = '', $default = '') 
+{
+    if (empty($name)) return $_GET;
+    
+    if (isset($_GET[$name]))
+        return  $_GET[$name];
+
+    return $default;
+}
