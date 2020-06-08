@@ -12,14 +12,25 @@ var API = {
 };
 
 var VERIFY = {
-	phone: function(phone) {
-		return this.check(phone);
+	phone: function (phone) {
+		var reg = /^1\d{10}/;
+		return VERIFY.check(phone, reg);
 	},
-	password: function(password) {
-		return this.check(password);
+	email: function (email) {
+		var reg = /^([\.a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+(\.[a-zA-Z0-9_-])+/;
+		return VERIFY.check(email, reg);
 	},
-	check: function(code, reg) {
-		if (code == '') return false;
-		return true;
+	password: function (password) {
+		var reg = /^[0-9A-Za-z]{6,}/;
+		return VERIFY.check(password, reg);
+	},
+	code: function(code) {
+		var reg = /^\d{4,}/;
+		return VERIFY.check(code, reg);
+	},
+	check: function(input, reg) {
+		input = input.trim();
+		if (input == '') return false;
+		return reg.test(input);
 	}
 };
