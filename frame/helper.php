@@ -23,6 +23,11 @@ function isMobile()
     return false;
 }
 
+function dd($data = '') {
+    print_r($data);
+    exit();
+}
+
 //数据库函数
 function DB($db = null)
 {

@@ -1,9 +1,9 @@
 <?php
 
 //加载 composer 配置文件
-if (is_file(ROOT_PATH . 'vendor/autoload.php')) {
-	require_once ROOT_PATH . 'vendor/autoload.php';
-} 
+// if (is_file(ROOT_PATH . 'vendor/autoload.php')) {
+// 	require_once ROOT_PATH . 'vendor/autoload.php';
+// } 
 
 //配置文件
 if (is_file(ROOT_PATH . 'frame/env.php')) {

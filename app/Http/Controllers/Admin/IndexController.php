@@ -19,13 +19,16 @@ class IndexController extends Controller
 
 	public function index() 
 	{
-		// dd(12312);
+		Html::addCss('admin/common');
+		view();
 	}
 
 	public function login()
 	{
 		Html::addCss('admin/login');
 		Html::addJs('admin/login');
+
+		dd(APP_START_TIME - microtime(true));
 
 		$attachmentService = \App::make('App/Services/AttachmentService');
 

@@ -38,10 +38,6 @@ class App
         //注册异常处理
         Erroring::register();
 
-        //引入公共css js
-        Html::addCss(['common', 'font', 'icon', 'space']);
-        Html::addJs(['jquery-3.5.1.min', 'common']);
-
 		return self::instance();
 	}
 
@@ -58,9 +54,15 @@ class App
 
 		\App\Http\Middleware\VerifyToken::handle($info);
 
+        if ($info['Class'] != 'Api') {
+            //引入公共css js
+            Html::addCss(['common', 'font', 'icon', 'space']);
+            Html::addJs(['jquery-3.5.1.min', 'common']);
+        }
+        
 		call_user_func_array([self::autoload($class), $info['Func']], []);
 
-         // 应用调试模式
+        // 应用调试模式
         if (getenv('APP_DEBUG')) {
             self::debugModeInit();
         }

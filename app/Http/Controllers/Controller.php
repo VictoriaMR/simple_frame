@@ -14,12 +14,15 @@ class Controller
      */
     protected function result($code, $data=[], $options=[])
     {
-        $data = [
+
+       $data = [
             'code' => $code,
-            'message' => isset($options['message']) ? $options['message'] : '',
             'data' => $data
         ];
 
+        $data = array_merge($data, $options);
+        
+        header('Content-Type:application/json; charset=utf-8');
         echo json_encode($data, JSON_UNESCAPED_UNICODE);
         exit();
     }

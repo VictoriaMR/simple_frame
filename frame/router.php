@@ -33,7 +33,7 @@ class Router
         /* 方法名 */
         $Func 	   = array_pop($pathInfoArr);
         /* 中间路径 */
-        $ClassPath = implode('/', $pathInfoArr);
+        $ClassPath = $pathInfoArr;
 
         $funcArr = [
 			'Class'     => !empty($Class) ? $Class : 'Home',
@@ -60,7 +60,14 @@ class Router
 					//方法名小写
 					$funcArr[$key] = strtolower(substr($value, 0, 1)) . substr($value, 1);
 				} else {
-					$funcArr[$key] = strtoupper(substr($value, 0, 1)) . substr($value, 1);
+					if (is_array($value)) {
+						foreach ($value as $k => $v) {
+							$value[$k] = strtoupper(substr($v, 0, 1)) . substr($v, 1);
+						}
+						$funcArr[$key] = implode('\\', $value);
+					} else {
+						$funcArr[$key] = strtoupper(substr($value, 0, 1)) . substr($value, 1);
+					}
 					$i ++;
 				}
 			}

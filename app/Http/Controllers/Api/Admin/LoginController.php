@@ -1,10 +1,9 @@
 <?php
 
-namespace App\Http\Controllers\Admin;
+namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminMemberService;
-use frame\Html;
 
 /**
  *  登陆控制器
@@ -17,26 +16,12 @@ class LoginController extends Controller
 		$this->baseService = $service;
 	}
 
-	public function index()
-	{
-		Html::addCss('admin/login');
-		Html::addJs('admin/login');
-
-		$attachmentService = \App::make('App/Services/AttachmentService');
-
-		$data = $attachmentService->getListByTypeOne($attachmentService::constant('TYPE_ADMIN_LOGIN_BACKGROUD'));
-		
-		assign(['bg_img' => $data['url']]);
-		
-		view();
-	}
-
 	public function login() 
 	{
+
 		$phone = ipost('phone', '');
 		$code = ipost('code', '');
 		$password = ipost('password', '');
-		$isAjax = ipost('is_ajax', 0);
 
 		if (empty($phone) || (empty($code || $password))) {
 			return $this->result(10000, [], ['message' => '输入错误!']);
