@@ -8,7 +8,6 @@ img { border:0; max-width: 100%; max-height: 100%;}
 button, input, select, textarea { font-size:100%; } 
 table { border-collapse:collapse; border-spacing:0; }
 
-
 .btn {
     border-radius: 4px;
     text-align: center;
@@ -51,10 +50,22 @@ table { border-collapse:collapse; border-spacing:0; }
     float: left;
 }
 
+.right {
+    float: right;
+}
+
 .pointer {
     cursor: pointer;
 }
 
 .relative {
     position: relative;
+}
+
+.flex {
+    display: flex;
+}
+
+.flex-1 {
+    flex: 1;
 }

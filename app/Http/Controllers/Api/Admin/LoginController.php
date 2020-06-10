@@ -30,7 +30,7 @@ class LoginController extends Controller
 		$result = $this->baseService->login($phone, $password, false, true);
 
 		if ($result) {
-			return $this->result(200, $result, ['message' => '登录成功!']);
+			return $this->result(200, ['url' => url('admin/index')], ['message' => '登录成功!']);
 		} else {
 			return $this->result(10000, $result, ['message' => '账号不匹配!']);
 		}

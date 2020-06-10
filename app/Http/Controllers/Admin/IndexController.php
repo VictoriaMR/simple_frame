@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-
 use frame\Html;
+use frame\Session;
 
 /**
  * 
@@ -20,21 +20,19 @@ class IndexController extends Controller
 	public function index() 
 	{
 		Html::addCss('admin/common');
+
+		$colorService = \App::make('App\Services\ColorService');
+		$colorList = $colorService->getList();
+
+		$info = Session::getInfo('admin');
+
+		assign('info', $info);
+
 		view();
 	}
 
-	public function login()
+	public function show() 
 	{
-		Html::addCss('admin/login');
-		Html::addJs('admin/login');
-
-		dd(APP_START_TIME - microtime(true));
-
-		$attachmentService = \App::make('App/Services/AttachmentService');
-
-		$data = $attachmentService->getListByTypeOne($attachmentService::constant('TYPE_ADMIN_LOGIN_BACKGROUD'));
-		
-		assign(['bg_img' => $data['url']]);
 		view();
 	}
 }

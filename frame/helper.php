@@ -98,3 +98,8 @@ function iget($name = '', $default = '')
 
     return $default;
 }
+
+function url($url = '') 
+{
+    return getenv('APP_DOMAIN').$url;
+}

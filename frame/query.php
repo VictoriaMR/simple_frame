@@ -14,8 +14,8 @@ Class Query
 	protected $_param = [];
 	protected $_groupBy = '';
 	protected $_orderBy = '';
-	protected $_offset = 0;
-	protected $_limit = 0;
+	protected $_offset = null;
+	protected $_limit = null;
 
 	public static function getInstance() 
     {

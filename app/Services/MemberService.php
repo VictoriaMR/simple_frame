@@ -2,8 +2,8 @@
 
 namespace app\Services;
 
-use app\Services\Base as BaseService;
-use app\Models\Member;
+use App\Services\Base as BaseService;
+use App\Models\Member;
 use frame\Session;
 
 /**
@@ -112,18 +112,24 @@ class MemberService extends BaseService
 		$password = $this->getPasswd($password, $info['salt']);
 
 		if ($this->checkPassword($password, $info['password'])) {
-			if ($isToken) { //生成token 返回
-				return $this->generateToken($info['user_id']);
-			} else { //生成session
-				$data = [
-					'mem_id' => $info['mem_id'],
-					'name' => $info['name'],
-					'mobile' => $info['mobile'],
-					'nickname' => $info['nickname'],
-					'is_super' => $info['is_super'],
-				];
-				return Session::set($isAdmin ? 'admin' : 'home', $data);
+			$data = [
+				'mem_id' => $info['mem_id'],
+				'name' => $info['name'],
+				'mobile' => $info['mobile'],
+				'nickname' => $info['nickname'],
+			];
+
+			if ($isAdmin) {
+				if (!empty($info['color_id'])) {
+					$colorService = \App::make('App\Services\ColorService');
+					$colorInfo = $colorService->loadData($info['color_id']);
+				}
+				$data['is_super'] = $info['is_super'];
+				$data['color_name'] = $colorInfo['color_name'] ?? '';
+				$data['color_value'] = $colorInfo['color_value'] ?? '';
 			}
+
+			return Session::set($isAdmin ? 'admin' : 'home', $data);
 		}
 
 		return false;

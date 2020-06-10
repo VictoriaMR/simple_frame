@@ -15,5 +15,5 @@
 </head>
 <body>
 <script type="text/javascript">
-var ADMIN_API = "<?php echo getenv('APP_DOMAIN').'api/admin/';?>";
+var ADMIN_API = "<?php echo getenv('APP_DOMAIN').'admin/';?>";
 </script>

@@ -30,10 +30,18 @@ class Router
 
         /* 类名 */
         $Class 	   = array_shift($pathInfoArr);
-        /* 方法名 */
-        $Func 	   = array_pop($pathInfoArr);
-        /* 中间路径 */
-        $ClassPath = $pathInfoArr;
+
+		if (count($pathInfoArr) > 1) {
+	        /* 方法名 */
+	        $Func 	   = array_pop($pathInfoArr);
+	        /* 中间路径 */
+	        $ClassPath = $pathInfoArr;
+		} else {
+			/* 方法名 */
+	        $ClassPath 	   = array_pop($pathInfoArr);
+	        /* 中间路径 */
+	        $Func = $pathInfoArr;
+		}
 
         $funcArr = [
 			'Class'     => !empty($Class) ? $Class : 'Home',

@@ -9,12 +9,18 @@ class Session
 		return !empty($_SESSION[$type] ?? []);
 	}
 
-	public static function set($key, $data)
+	public static function set($key, $data = [])
 	{
-		if (empty($key) || empty($data)) return false;
+		if (empty($key)) return false;
 
 		$_SESSION[$key] = $data;
 
 		return true;
+	}
+
+	public static function getInfo($name = '') 
+	{
+		if (empty($name)) return $_SESSION;
+		return $_SESSION[$name] ?? '';
 	}
 }

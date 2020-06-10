@@ -30,7 +30,7 @@ var LOGIN = {
 
 			API.post(ADMIN_API+'login/login', $(this).parent('form').serializeArray(), function(res) {
 				if (res.code == 200) {
-					window.location.reload();
+					window.location.href = res.data.url;
 				} else {
 					$('#login-error').show().find('#login-error-msg').text(res.message);
 				}
