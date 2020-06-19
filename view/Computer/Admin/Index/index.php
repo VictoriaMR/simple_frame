@@ -13,33 +13,27 @@
 	</div>
 </div>
 <div id="content" class="flex">
-	<div id="left" class="left" <?php if (!empty($info['color_value'])) { ?> style="background-color: <?php echo $info['color_value'];?>" <?php } ?>>
-		<div id="person">
-			<div class="avatar"><img src="./Baycheer ERP_files/male.jpg"></div>
-		</div>
-		<div id="click-list" <?php if (!empty($info['color_value'])) { ?> style="background-color: <?php echo $info['color_value'];?>" <?php } ?>>
-			
-		</div>
-	</div>
-	<div id="right" class="flex-1">
-		<div id="tab-list"></div>
-		<div id="tab-content">
-			<div class="tab-item">
-        		<iframe id="subframe-1" width="100%" height="100%" frameborder="0" src="<?php echo url('admin/index/show');?>"></iframe>
-			</div>
-			
-		</div>
-    </div>
+	<table width="100%" border="0">
+		<tr>
+			<td width="10%" height="100%">
+				<div id="left" <?php if (!empty($info['color_value'])) { ?> style="background-color: <?php echo $info['color_value'];?>" <?php } ?>>
+					
+				</div>
+			</td>
+			<td width="90%">
+				2
+			</td>
+		</tr>
+	</table>
 </div>
 
 <script type="text/javascript">
 $(document).ready(function(){
 	var width = $(window).width();
 	var height = $(window).height();
-	var offsetTop = $('#tab-content').offset().top+1;
-	var offsetLeft = $('#left').width();
-	console.log(width, height, offsetTop, offsetLeft);
-	$('#tab-content .tab-item').css({width: (width-offsetLeft)+'px', height: (height-offsetTop)+'px'});
+	var topH = $('#header').height();
+
+	$('#left').css({height: height - topH - 1 + 'px'});
 });
 </script>
 

@@ -32,17 +32,7 @@
     transform:rotate(180deg);
 }
 
+
 #left {
-	width: max-content;
-}
-
-#person {
 	width: 100%;
-	height: 50px;
-}
-
-#click-list {
-	position: absolute;
-	width: 40px;
-	height: calc(100% - 50px - 35px);
 }
