@@ -16,7 +16,7 @@ class VerifyToken
      */
     protected static $except = [
         'Admin/Login/index',
-        'Admin/Login/login',
+        'Api/Admin/Login/login',
     ];
 
     protected static $exceptNotToken = [
@@ -35,7 +35,7 @@ class VerifyToken
     {
         $route = implode('/', $request);
 
-        // dd($route);
+        dd($route);
 
         if (self::inExceptArray($route)) {
             return true;

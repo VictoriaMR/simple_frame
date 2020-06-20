@@ -19,6 +19,9 @@ class LoginController extends Controller
 	public function login() 
 	{
 
+		print_r(Html::getCss());
+		print_r(Html::getJs());
+		dd();
 		$phone = ipost('phone', '');
 		$code = ipost('code', '');
 		$password = ipost('password', '');

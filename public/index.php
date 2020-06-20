@@ -4,6 +4,9 @@
  * 入口文件
  */
 
+print_r(123123);
+die();
+
 //定义项目开始时间
 define('MEM0RY_START', memory_get_usage());
 define('APP_START_TIME', microtime(true));

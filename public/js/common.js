@@ -5,6 +5,9 @@ var API = {
 		}, 'json');
 	},
 	post: function(url, param, callback) {
+		$.ajaxSetup({
+	  		async: false
+	  	});
 		$.post(url, param, function(res) {
 			if (callback) callback(res);
 		}, 'json');
