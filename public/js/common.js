@@ -6,7 +6,7 @@ var API = {
 	},
 	post: function(url, param, callback) {
 		$.ajaxSetup({
-	  		async: false
+	  		async: true
 	  	});
 		$.post(url, param, function(res) {
 			if (callback) callback(res);

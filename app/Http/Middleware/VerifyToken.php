@@ -35,7 +35,7 @@ class VerifyToken
     {
         $route = implode('/', $request);
 
-        dd($route);
+        // dd($route);
 
         if (self::inExceptArray($route)) {
             return true;
