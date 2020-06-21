@@ -20,6 +20,7 @@ class IndexController extends Controller
 	public function index() 
 	{
 		Html::addCss('admin/common');
+		Html::addJs('admin/index');
 
 		$colorService = \App::make('App\Services\ColorService');
 		$colorList = $colorService->getList();

@@ -9,7 +9,7 @@ class Erroring
     public static function register()
     {
 
-        if (getenv('APP_DEBUG')) {
+        if (getenv()['APP_DEBUG']) {
 			error_reporting(E_ALL & ~ E_NOTICE);
 	    	// set_error_handler([__CLASS__, 'error_debug']);
 	        // set_exception_handler([__CLASS__, 'exception_debug']);

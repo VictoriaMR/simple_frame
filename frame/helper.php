@@ -103,3 +103,12 @@ function url($url = '')
 {
     return getenv('APP_DOMAIN').$url;
 }
+
+function media($url = '') 
+{
+    if (empty($url)) return '';
+    if (strpos($url, 'http') !== false && strpos($url, 'https') !== false) {
+        return getenv('FILE_CENTER').$url;
+    }
+    return $url;
+}

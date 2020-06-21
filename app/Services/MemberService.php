@@ -117,6 +117,7 @@ class MemberService extends BaseService
 				'name' => $info['name'],
 				'mobile' => $info['mobile'],
 				'nickname' => $info['nickname'],
+				'avatar' => media($info['avatar']),
 			];
 
 			if ($isAdmin) {

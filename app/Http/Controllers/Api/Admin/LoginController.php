@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Services\AdminMemberService;
+use frame\Html;
 
 /**
  *  登陆控制器
@@ -18,10 +19,6 @@ class LoginController extends Controller
 
 	public function login() 
 	{
-
-		print_r(Html::getCss());
-		print_r(Html::getJs());
-		dd();
 		$phone = ipost('phone', '');
 		$code = ipost('code', '');
 		$password = ipost('password', '');
