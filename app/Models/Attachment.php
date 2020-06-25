@@ -59,9 +59,8 @@ class Attachment extends BaseModel
     {
     	if (empty($checkno)) return false;
 
-        $result = $this->getOne($this->table, ['name' => $checkno], ['COUNT(*) count']);
-
-        return (int) $result['count'] > 0;
+        return $this->where('name', $checkno)
+                    ->count() > 0;
     }
 
     /**
