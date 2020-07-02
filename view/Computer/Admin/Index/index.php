@@ -68,7 +68,7 @@
 						<li class="select">商品管理</li>
 					</ul>
 				</div>
-				<iframe src="<?php echo url('admin/product/list');?>" frameborder="0"></iframe>
+				<iframe src="<?php echo url('admin/product/list');?>" frameborder="0" width="100%" height="100%"></iframe>
 			</td>
 		</tr>
 	</table>

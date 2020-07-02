@@ -24,7 +24,8 @@ class ProductController extends Controller
 
 		$list = $this->baseService->getList([], $page, $size);
 
-		dd($list);
+		assign(['list' => $list]);
+
 		view();
 	}
 }

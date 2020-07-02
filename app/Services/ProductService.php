@@ -26,7 +26,7 @@ class ProductService extends BaseService
                 foreach ($list as $key => $value) {
                     $value['creat_format_at'] = date('Y-m-d H:i:s', $value['create_at']);
                     $value['pro_image'] = media($value['pro_image'], 'product');
-                    $list[$k] = $value;
+                    $list[$key] = $value;
                 }
             }
         }

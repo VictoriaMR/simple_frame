@@ -188,8 +188,3 @@
 #iframe-list ul > li.select {
 	background-color: #FFF;
 }
-
-#iframe-content iframe {
-	width: 100%;
-	height: 100%;
-}

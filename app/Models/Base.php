@@ -87,13 +87,11 @@ class Base extends Query
     public function getPaginationList($list, $total, $page = 1, $pagesize = 10)
     {
         return [
-            'pagination' => [
-                'total' => $total,
-                'pagesize' => $pagesize,
-                'page' => $page
-            ],
-
-            'list' => $list
+            'total' => $total,
+            'pagesize' => $pagesize,
+            'page' => $page,
+            'page_total' => ceil($total / $pagesize),
+            'list' => $list,
         ];
     }
 

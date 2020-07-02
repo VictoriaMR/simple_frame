@@ -70,7 +70,7 @@ class Erroring
 	 */
 	public static function catch_error()
 	{
-		echo '404';
+		// echo '404';
 		exit();
 	}
 }

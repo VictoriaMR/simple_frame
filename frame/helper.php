@@ -108,16 +108,19 @@ function media($url = '', $type='')
 {
     switch ($type) {
         case 'product':
-            # code...
+            if (empty($url)) {
+                $url = 'image/img/no_img.jpg';
+                $site = getenv('APP_DOMAIN');
+            }
             break;
-        
         default:
-            # code...
+            $url = 'image/img/no_img.jpg';
+            $site = getenv('FILE_CENTER');
             break;
     }
-    if (empty($url)) {}
-    if (strpos($url, 'http') !== false && strpos($url, 'https') !== false) {
-        return getenv('FILE_CENTER').$url;
+
+    if (strpos($url, 'http') === false && strpos($url, 'https') === false) {
+        return $site.$url;
     }
     return $url;
 }
