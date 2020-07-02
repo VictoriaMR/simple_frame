@@ -19,6 +19,12 @@ class ProductController extends Controller
 
 	public function list() 
 	{
+		$page = iGet('page', 1);
+		$size = iGet('size', 30);
+
+		$list = $this->baseService->getList([], $page, $size);
+
+		dd($list);
 		view();
 	}
 }

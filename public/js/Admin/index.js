@@ -5,8 +5,6 @@ var INDEX = {
 		var topH = $('#header').height();
 		$('#left').css({height: height - topH - 1 + 'px'});
 
-		// $('#iframe-content iframe').css({height: height - 65 + 'px'});
-
 		$('#left-one .toggle').on('click', function(){
 			var ow = $('#left-one').width();
 			if (ow == 40) {

@@ -104,9 +104,18 @@ function url($url = '')
     return getenv('APP_DOMAIN').$url;
 }
 
-function media($url = '') 
+function media($url = '', $type='') 
 {
-    if (empty($url)) return '';
+    switch ($type) {
+        case 'product':
+            # code...
+            break;
+        
+        default:
+            # code...
+            break;
+    }
+    if (empty($url)) {}
     if (strpos($url, 'http') !== false && strpos($url, 'https') !== false) {
         return getenv('FILE_CENTER').$url;
     }

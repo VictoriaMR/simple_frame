@@ -23,7 +23,7 @@ class IndexController extends Controller
 		Html::addJs('admin/index');
 
 		$colorService = \App::make('App\Services\ColorService');
-		$colorList = $colorService->getList();
+		// $colorList = $colorService->getList();
 
 		$info = Session::getInfo('admin');
 

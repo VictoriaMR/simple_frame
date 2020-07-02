@@ -2,20 +2,36 @@
 
 namespace App\Services;
 
+use App\Services\Base as BaseService;
 use App\Services\ProductDataService;
+use App\Models\Product;
 
 /**
  * 
  */
-class ProductService
+class ProductService extends BaseService
 {
-	public function __construct(ProductDataService $data)
+	public function __construct(Product $model)
     {
+        $this->baseModel = $model;
     }
 
-    function index($abc = '')
+    public function getList($where = [], $page = 1, $size = 10)
     {
-        dd($abc);
+        $total = $this->baseModel->getListTotal($where);
+
+        if ($total > 0) {
+            $list = $this->baseModel->getList($where, $page, $size);
+            if (!empty($list)) {
+                foreach ($list as $key => $value) {
+                    $value['creat_format_at'] = date('Y-m-d H:i:s', $value['create_at']);
+                    $value['pro_image'] = media($value['pro_image'], 'product');
+                    $list[$k] = $value;
+                }
+            }
+        }
+
+        return $this->getPaginationList($list ?? [], $total, $page, $size);
     }
 
     public function save($proId, $data = [])

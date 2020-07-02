@@ -91,14 +91,15 @@ Class Query
 
 	public function limit($value)
     {
-        $this->$limit = (int) $value;
-
+    	$value = (int) $value;
+        $this->_limit = $value > 0 ? $value : 0;
         return $this;
     }
 
 	public function offset($value)
     {
-        $this->$offset = (int) $value;
+    	$value = (int) $value;
+        $this->_offset = $value > 0 ? $value : 0;
 
         return $this;
     }
@@ -162,6 +163,16 @@ Class Query
 		if ($this->_limit !== null ) {
 			$sql .= ',' . (int) $this->_limit;
 		}
+
+		//清空储存数据
+		$this->_columns = null;
+		$this->_where = [];
+		$this->_whereStr = '';
+		$this->_param = [];
+		$this->_groupBy = '';
+		$this->_orderBy = '';
+		$this->_offset = null;
+		$this->_limit = null;
 
 		return $sql;
 	}
