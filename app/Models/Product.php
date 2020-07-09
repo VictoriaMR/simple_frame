@@ -1,8 +1,8 @@
 <?php
 
-namespace app\Models;
+namespace App\Models;
 
-use app\Models\Base as BaseModel;
+use App\Models\Base as BaseModel;
 
 /**
  * 	背景颜色类

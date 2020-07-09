@@ -22,13 +22,20 @@ class IndexController extends Controller
 		Html::addCss('admin/common');
 		Html::addJs('admin/index');
 
-		$colorService = \App::make('App\Services\ColorService');
-		// $colorList = $colorService->getList();
+		//获取喜好颜色
+		$colorService = \App::make('App\Services\Admin\ColorService');
+		$colorList = $colorService->getList();
+
+		//获取控制器列表
+		$controllerService = \App::make('App\Services\Admin\ControllerService');
+
+		$controllerList = $controllerService->getListFormat();
 
 		$info = Session::getInfo('admin');
 
 		assign('info', $info);
-		dd(123123);
+		assign('list', $controllerList);
+
 		view();
 	}
 

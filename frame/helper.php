@@ -100,6 +100,11 @@ function iget($name = '', $default = '')
     return $default;
 }
 
+function input()
+{
+    return array_merge($_GET, $_POST);
+}
+
 function url($url = '') 
 {
     return getenv('APP_DOMAIN').$url;

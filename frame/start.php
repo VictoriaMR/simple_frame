@@ -25,7 +25,7 @@ require_once ROOT_PATH . 'frame/app.php';
 
 //也可以在 index.php 定义一些自己的变量 | 设置
 header("Access-Control-Allow-Origin: *");
-header("Content-Root: " . getenv('APP_DOMAIN'));
+header("Content-Root: " . Env('APP_DOMAIN'));
 @session_start();
 
 //执行文件入口

@@ -27,10 +27,10 @@
 						</div>
 						<div class="left name color-white">
 							<div class="ellipsis-1">
-								<span class="font-14"><?php echo $info['name'];?></span>
+								<span class="font-14"><?php echo $info['name'] ?? '暂无';?></span>
 								<a class="right" href="<?php echo url('admin/login/logout');?>"><img src="<?php echo url('image/icon/exit.png');?>"></a>
 							</div>
-							<div class="ellipsis-1 color-red"><?php echo $info['mobile'];?></div>
+							<div class="ellipsis-1 color-red"><?php echo $info['mobile'] ?? '暂无';?></div>
 						</div>
 						<div class="clear"></div>
 					</div>
@@ -39,25 +39,37 @@
 							<div class="toggle close" data-title="菜单切换开关">
 								<img src="<?php echo url('image/icon/task.png');?>">
 							</div>
-							<div id="feature-main-53007" class="feature selected" data-feature-id="53007" data-title="管理中心">
-					            <img src="<?php echo url('image/icon/53007.png');?>">
-					            <p>管理中心</p>
+							<?php if (!empty($list)) { ?>
+							<?php foreach ($list as $value) { ?>
+							<div id="feature-main-<?php echo $value['con_id'];?>" class="feature" data-feature-id="<?php echo $value['con_id'];?>" data-title="<?php echo $value['name'] ;?>">
+					            <img src="<?php echo url('image/icon/'.$value['icon'].'.png');?>">
+					            <p><?php echo $value['name'] ;?></p>
 					        </div>
+					        <?php } ?>
+					    	<?php } ?>
 						</div>
 						<div class="left" id="left-two">
-							<div id="menu-main-53007">
+							<?php if (!empty($list)) { ?>
+							<?php foreach ($list as $value) { ?>
+							<div id="menu-main-<?php echo $value['con_id'];?> hidden">
 								<div class="title">
-									<span>管理中心</span>
+									<span><?php echo $value['name'] ;?></span>
 								</div>
 								<div class="menu-content">
 									<ul>
-										<li data-src="<?php echo url('admin/product/list');?>">
-											<span>商品管理</span>
-											<a title="新窗口打开" target="_blank" href="<?php echo url('admin/product/list');?>"></a>
+										<?php if (!empty($value['son'])) { ?>
+										<?php foreach ($value['son'] as $v) { ?>
+										<li data-src="<?php echo url('admin/'.$value['name_en'].'/'.$v['name_en']);?>" data-id="<?php echo $v['con_id'];?>">
+											<span><?php echo $v['name'];?></span>
+											<a title="新窗口打开" target="_blank" href="<?php echo url('admin/'.$value['name_en'].'/'.$v['name_en']);?>"></a>
 										</li>
+										<?php } ?>
+										<?php } ?>
 									</ul>
 	        					</div>
 							</div>
+							<?php } ?>
+							<?php } ?>
 						</div>
 					</div>
 				</div>
@@ -65,10 +77,12 @@
 			<td valign="top" id="iframe-content">
 				<div id="iframe-list">
 					<ul>
-						<li class="select">商品管理</li>
+						
 					</ul>
 				</div>
-				<iframe src="<?php echo url('admin/product/list');?>" frameborder="0" width="100%" height="100%"></iframe>
+				<div id="iframe-list-content">
+					
+				</div>
 			</td>
 		</tr>
 	</table>
@@ -78,5 +92,4 @@ $(document).ready(function(){
 	INDEX.init();
 });
 </script>
-
 <?php $this->load('Common.baseFooter');?>

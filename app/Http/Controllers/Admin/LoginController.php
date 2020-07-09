@@ -3,7 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\AdminMemberService;
+use App\Services\Admin\MemberService;
 use frame\Html;
 
 /**
@@ -12,7 +12,7 @@ use frame\Html;
 class LoginController extends Controller
 {
 	
-	function __construct(AdminMemberService $service)
+	function __construct(MemberService $service)
 	{
 		$this->baseService = $service;
 	}

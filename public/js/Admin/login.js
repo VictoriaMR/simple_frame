@@ -5,8 +5,6 @@ var LOGIN = {
 			$('#login-error').hide();
 			$(this).parent('form').find('input:visible').each(function(){
 				var name = $(this).attr('name');
-				console.log($(this).val())
-				console.log(name, VERIFY[name]($(this).val()))
 				if (!VERIFY[name]($(this).val())) {
 					switch (name) {
 						case 'phone':

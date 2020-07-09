@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use app\Models\Base as BaseModel;
+use App\Models\Base as BaseModel;
 
 class Attachment extends BaseModel
 {

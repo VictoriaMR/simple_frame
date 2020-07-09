@@ -18,11 +18,7 @@ class IndexController
     }
 
 	public function index()
-	{
-		// Redis(0)->set('test', 'testText');
-		
-		echo Redis()->ttl('test');
-
+	{	
 		return view();
 	}
 }
