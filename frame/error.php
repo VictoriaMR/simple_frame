@@ -8,8 +8,7 @@ class Erroring
      */
     public static function register()
     {
-
-        if (getenv()['APP_DEBUG']) {
+        if (Env('APP_DEBUG')) {
 			error_reporting(E_ALL & ~ E_NOTICE);
 	    	// set_error_handler([__CLASS__, 'error_debug']);
 	        // set_exception_handler([__CLASS__, 'exception_debug']);
@@ -29,7 +28,6 @@ class Erroring
     public static function exception_debug($exception)
     {
     	$msg = sprintf('<div>[%s]</div> <div> %s </div> <div> 第 %s 行 </div> <div> 错误: %s </div><br />', date( "Y-m-d H:i:s" ), $exception->getFile(), $exception->getLine(), $exception->getMessage());
-    	dd($exception->getTrace());
     	foreach ($exception->getTrace() as $key => $value) {
     		$msg .= '<div>'.sprintf(' %s, 第 %s 行', $value['file'] ?? '', $value['line']).'</div>';
     	}

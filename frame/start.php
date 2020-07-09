@@ -1,9 +1,14 @@
 <?php
 
 //加载 composer 配置文件
-// if (is_file(ROOT_PATH . 'vendor/autoload.php')) {
-// 	require_once ROOT_PATH . 'vendor/autoload.php';
-// } 
+if (is_file(ROOT_PATH . 'vendor/autoload.php')) {
+	require_once ROOT_PATH . 'vendor/autoload.php';
+} 
+
+//助手 函数文件
+if (is_file(ROOT_PATH . 'frame/helper.php')) {
+	require_once ROOT_PATH . 'frame/helper.php';
+}
 
 //配置文件
 if (is_file(ROOT_PATH . 'frame/env.php')) {
@@ -13,11 +18,6 @@ if (is_file(ROOT_PATH . 'frame/env.php')) {
 //配置数据文件
 if (is_file(ROOT_PATH . 'frame/config.php')) {
 	require_once ROOT_PATH . 'frame/config.php';
-}
-
-//助手 函数文件
-if (is_file(ROOT_PATH . 'frame/helper.php')) {
-	require_once ROOT_PATH . 'frame/helper.php';
 }
 
 //框架 APP 文件

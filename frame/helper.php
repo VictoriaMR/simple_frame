@@ -23,7 +23,8 @@ function isMobile()
     return false;
 }
 
-function dd($data = '') {
+function dd($data = '') 
+{
     print_r($data);
     exit();
 }
@@ -31,7 +32,7 @@ function dd($data = '') {
 //数据库函数
 function DB($db = null)
 {
-	return DB::getInstance($db);
+	return \frame\DB::getInstance($db);
 }
 
 /*
@@ -123,4 +124,21 @@ function media($url = '', $type='')
         return $site.$url;
     }
     return $url;
+}
+
+function Redis($db = 0) 
+{
+    return \frame\Redis::getInstance($db);
+}
+
+function Config($name = '') 
+{
+    if (empty($name)) return $GLOBALS;
+    return $GLOBALS[$name] ?? [];
+}
+
+function Env($name = '', $replace = '')
+{
+    if (empty($name)) return Config('ENV');
+    return Config('ENV')[$name] ?? $replace;
 }

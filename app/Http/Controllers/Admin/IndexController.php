@@ -28,7 +28,7 @@ class IndexController extends Controller
 		$info = Session::getInfo('admin');
 
 		assign('info', $info);
-
+		dd(123123);
 		view();
 	}
 

@@ -57,13 +57,13 @@ class App
         if ($info['Class'] != 'Api') {
             //引入公共css js
             Html::addCss(['common', 'font', 'icon', 'space']);
-            Html::addJs(['jquery-3.5.1.min', 'common']);
+            Html::addJs(['jquery.min', 'common']);
         }
 
 		call_user_func_array([self::autoload($class), $info['Func']], []);
 
         // 应用调试模式
-        if (getenv()['APP_DEBUG']) {
+        if (Env('APP_DEBUG')) {
             self::debugModeInit();
         }
 

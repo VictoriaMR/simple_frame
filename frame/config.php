@@ -1,10 +1,10 @@
 <?php
 
 //config 目录中的数组
-$configDir = ROOT_PATH . 'config/';
-if (is_dir($configDir)) {
-	foreach (scandir($configDir) as $value) {
+if (is_dir(ROOT_PATH . 'config/')) {
+	foreach (scandir(ROOT_PATH . 'config/') as $value) {
 		if ($value == '.' || $value == '..') continue;
-		$GLOBALS[str_replace('.php', '', $value)] = require_once $configDir . $value;
+		$GLOBALS[str_replace('.php', '', $value)] = require_once ROOT_PATH . 'config/' . $value;
 	}
+	unset($value);
 }
