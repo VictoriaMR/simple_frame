@@ -142,3 +142,12 @@ function Env($name = '', $replace = '')
     if (empty($name)) return Config('ENV');
     return Config('ENV')[$name] ?? $replace;
 }
+
+function DbConfig($db = 'default')
+{
+    if (empty(Config('database'))) {
+        throw new Exception("数据库配置文件不存在", 1);
+        exit();
+    }
+    return Config('database')[$db] ?? [];
+}

@@ -46,16 +46,17 @@ class Connection
 
 		if (empty(self::$_instance[$db][$database])) {
 
-			$config = $GLOBALS['database'][$db] ?? [];
+			$config = DbConfig($db);
+
 			if (empty($config))
 				throw new \Exception("Connect Error： Cannot found {$db} in config/database");
 
 			self::$_instance[$db][$database] = self::connect(
 				$config['db_host'] ?? '', 
-				$config['db_user'] ?? '', 
-				$config['db_pass'] ?? '', 
+				$config['db_username'] ?? '', 
+				$config['db_password'] ?? '', 
 				$config['db_port'] ?? '', 
-				$config['db_name'] ?? '', 
+				$config['db_database'] ?? '', 
 				$config['db_charset'] ?? ''
 			);
 		}
