@@ -93,6 +93,15 @@ class App
     		$fileName = $abstract;
     	}
 
+        $temp = explode('/', $fileName);
+        if ($temp[0] == 'frame') {
+            for ($i=1; $i < count($temp); $i++) { 
+                $temp[$i] = strtolower($temp[$i]);
+            }
+            $fileName = implode('/', $temp);
+            unset($temp);
+        }
+
         $fileName = ROOT_PATH . str_replace(['\\', 'App/'], ['/', 'app/'], $fileName) . '.php';
 
         if (is_file($fileName)){
