@@ -27,10 +27,10 @@ class Html
 
 		if (is_array($name)) {
 			foreach ($name as $value) {
-				self::$_JS[] = getenv('APP_DOMAIN') . 'js/' . $value . '.js';
+				self::$_JS[] = Env('APP_DOMAIN') . 'js/' . $value . '.js';
 			}
 		} else {
-			self::$_JS[] = getenv('APP_DOMAIN') . 'js/' . $name . '.js';
+			self::$_JS[] = Env('APP_DOMAIN') . 'js/' . $name . '.js';
 		}
 		return true;
 	}

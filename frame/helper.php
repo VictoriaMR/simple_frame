@@ -107,7 +107,7 @@ function input()
 
 function url($url = '') 
 {
-    return getenv('APP_DOMAIN').$url;
+    return Env('APP_DOMAIN').$url;
 }
 
 function media($url = '', $type='') 
