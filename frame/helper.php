@@ -36,6 +36,16 @@ function isMobile($mobile = '')
     }
     return false;
 }
+function isCli()
+{
+    return stripos(php_sapi_name(), 'cli') !== false;
+}
+function isJson($string) 
+{ 
+    if (is_array($string)) return false;
+    $string = json_decode($string, true); 
+    return json_last_error() == JSON_ERROR_NONE ? $string : false;
+}
 function config($name = '') 
 {
     if (empty($name)) return $GLOBALS;
@@ -54,10 +64,6 @@ function redirect($url)
 {
     header('Location:'.$url);
     exit();
-}
-function isCli()
-{
-    return stripos(php_sapi_name(), 'cli') !== false;
 }
 function assign($name, $value = null)
 {
@@ -98,12 +104,6 @@ function iget($name = '', $default = null)
 function input()
 {
     return array_merge($_GET, $_POST);
-}
-function isJson($string) 
-{ 
-    if (is_array($string)) return false;
-    $string = json_decode($string, true); 
-    return json_last_error() == JSON_ERROR_NONE ? $string : false;
 }
 function redis($db = 0) 
 {

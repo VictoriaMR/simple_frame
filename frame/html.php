@@ -22,7 +22,7 @@ class Html
                 $name = $_route['path'] . DS . $_route['func'];
             }
         }
-        self::$_CSS[] = APP_DOMAIN . 'css' . DS . $matchPath . $name . '.css';
+        self::$_CSS[] = env('APP_DOMAIN') . 'css' . DS . $matchPath . $name . '.css';
         return true;
 	}
 
@@ -41,7 +41,7 @@ class Html
                 $name = $_route['path'] . DS . $_route['func'];
             }
         }
-        self::$_JS[] = APP_DOMAIN . 'js' . DS . $matchPath . $name . '.js';
+        self::$_JS[] = env('APP_DOMAIN') . 'js' . DS . $matchPath . $name . '.js';
         return true;
 	}
 
