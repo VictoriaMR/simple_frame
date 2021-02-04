@@ -69,9 +69,9 @@ function assign($name, $value = null)
 {
     return \frame\View::getInstance()->assign($name, $value);
 }
-function view($template = '')
+function view($template = '', $match = true)
 {
-    return \frame\View::getInstance()->display($template);
+    return \frame\View::getInstance()->display($template, $match);
 }
 function url($url = '', $param = []) 
 {

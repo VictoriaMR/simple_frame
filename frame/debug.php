@@ -53,7 +53,7 @@ class Debug
         }
         assign('trace', $trace);
         assign('runtime', $runtime);
-        return view('frame/pagetrace');
+        return view('frame/pagetrace', false);
 	}
 
     public static function runlog($msg = '')

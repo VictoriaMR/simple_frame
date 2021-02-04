@@ -16,28 +16,33 @@ class View
         return self::$_instance;
     }
 
-    public function display($template = '')
+    public function display($template = '', $match = true)
     {
-        $template = $this->getTemplate($template);
+        $template = $this->getTemplate($template, $match);
         if (is_file($template)) {
             extract(self::$data);
             include($template);
         } else {
-            exit($template.' was not exist!');
+            throw new \Exception($template.' was not exist!', 1);
         }
     }
 
-    private function getTemplate($template) 
+    private function getTemplate($template, $match = true) 
     {
         $matchPath = '';
         $_route = \Router::$_route;
-        if (empty($template)) {
+        if ($match) {
             if (env('APP_VIEW_MATCH')) {
                 $matchPath = (isMobile() ? 'mobile' : 'computer') . DS;
             }
-            $template = 'view' . DS . implode(DS, array_map('lcfirst', $_route));
+            if (empty($template)) {
+                $template = implode(DS, array_map('lcfirst', $_route));
+            } else {
+                $template = lcfirst($_route['class']) . DS . $template;
+            }
+            $template = 'view' . DS . $matchPath . $template;
         }
-        return ROOT_PATH . $matchPath . $template . '.php';
+        return ROOT_PATH . $template . '.php';
     }
 
     public function assign($name, $value = null)
@@ -50,8 +55,8 @@ class View
         return $this;
     }
 
-    public static function load($template = '')
+    public static function load($template = '', $match = true)
     {
-        return self::getInstance()->display($template);
+        return self::getInstance()->display($template, $match);
     }
 }
