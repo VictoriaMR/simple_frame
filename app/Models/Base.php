@@ -2,89 +2,65 @@
 
 namespace App\Models;
 
-use frame\Query;
-
-/**
- * 封装一些常用的ORM方法，所有Model以此为基类
- */
-class Base extends Query
+class Base
 {
-    /**
-     * 方法名称映射缓存
-     *
-     * @var array
-     */
-    protected $db = null;
+    protected $_instance;
+    protected $_connect;
+    protected $_table;
+    protected $_primaryKey;
 
-    public function __construct()
+    protected function getInstance()
     {
-        $this->_table = $this->table;
+        if (is_null($this->_instance)) {
+            $this->_instance = new \frame\Query($this->_connect, $this->_table);
+        }
+        return $this->_instance;
     }
 
-    /**
-     * 通过主键获取数据
-     *
-     * @param mix $id 主键值
-     * @return App\Model\Base
-     */
     public function loadData($id)
-    {
-        return $this->where($this->primaryKey, (int) $id)
-                    ->find();
+    {   
+        $id = (int) $id;
+        if (empty($id)) return [];
+        return $this->getInstance()->where($this->_primaryKey, $id)->find();
     }
 
-    /**
-     * 通过主键更新数据
-     *
-     * @param mix $id
-     * @param array $data
-     * @return bool
-     */
     public function updateDataById($id, $data)
     {
-        return $this->update($this->table, [$this->primaryKey=>$id], $data);
+        $id = (int) $id;
+        if (empty($id)) return false;
+        return $this->getInstance()->where($this->_primaryKey, $id)->update($data);
     }
 
-    public function addDataGetId($data)
+    public function deleteById($id)
     {
-        return $this->insertGetId($data);
+        $id = (int) $id;
+        if (empty($id)) return false;
+        return $this->getInstance()->where($this->_primaryKey, $id)->delete();
     }
 
-    public function addData($data)
+    public function insertGetId(array $data)
     {
-        return $this->insert($data);
+        if (empty($data)) return false;
+        return $this->getInstance()->insertGetId($data);
     }
 
-    /**
-     * 通过filter更新数据
-     *
-     * @param array $filter 更新条件 [["name", "张三"]]
-     * @param array $data 更新数据
-     */
-    public function updateDataByFilter($filter, $data)
+    public function insert(array $data)
     {
-        if (empty($filter)) return false;
-
-        return $this->update($this->table, $filter, $data);
+        if (empty($data)) return false;
+        return $this->getInstance()->insert($data);
     }
 
-    public function getDataCount($where = [])
+    public function getCount(array $where = []) 
     {
-        $result = $this->getOne($this->table, $where, ['COUNT(*) as count']);
-
-        return $result['count'] ?? 0;
+        return $this->getInstance()->where($where)->count();
     }
 
-    /**
-     * 获取当前业务模型列表数据
-     */
-    public function getDataList($where, $filed=[], $page=[], $orderBy=[])
+    public function getInfoByWhere(array $where = [], array $fields = [])
     {
-        $result = $this->getList($this->table, $where, $filed, $page, $orderBy);
-        return $result;
+        return $this->getInstance()->where($where)->field($fields)->find();
     }
 
-    public function getPaginationList($list, $total, $page = 1, $pagesize = 10)
+    public function getPaginationList($total = 0, $list = [], $page = 1, $pagesize = 10)
     {
         return [
             'total' => $total,
@@ -93,20 +69,5 @@ class Base extends Query
             'page_total' => ceil($total / $pagesize),
             'list' => $list,
         ];
-    }
-
-    /**
-     * @method 是否存在数据
-     * @author Victoria
-     * @date   2020-04-25
-     * @return boolean  
-     */
-    public function isExistData($primaryKeyId)
-    {
-        if (empty($primaryKeyId)) return false;
-
-        $result = $this->getOne($this->table, [$this->primaryKey=>$primaryKeyId], ['COUNT(*) count']);
-
-        return ($result['count'] ?? 0) > 0; 
     }
 }

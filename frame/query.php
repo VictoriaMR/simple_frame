@@ -4,105 +4,65 @@ namespace frame;
 
 Class Query
 {
-	private static $_instance = null;
-	public $_db = null;
-	public $_database = null;
-	public $_table = null;
-	protected $_columns = null;
-	protected $_where = [];
-	protected $_whereStr = '';
-	protected $_param = [];
-	protected $_groupBy = '';
-	protected $_orderBy = '';
-	protected $_offset = null;
-	protected $_limit = null;
+	private $_connect;
+	private $_database;
+	private $_table;
+	private $_columns;
+	private $_where;
+	private $_whereString;
+	private $_param;
+	private $_groupBy;
+	private $_orderBy;
+	private $_offset;
+	private $_limit;
 
-	public static function getInstance() 
-    {
-        if (!self::$_instance instanceof self) {
-            self::$_instance = new self();
-        }
-        return self::$_instance;
-    }
+	public function __construct($connect, $table) 
+	{
+		$this->_connect = $connect;
+		$this->_table = $table;
+	}
 
 	public function table($table = '')
 	{
-		if (empty($table))
-			throw new \Exception('MySQL SELECT QUERY, table can not be empty!', 1);
-
 		$this->_table = $table;
-
 		return $this;
 	}
 
-	public function where($column, $operator, $value = null)
+	public function where($columns, $operator = null, $value = null)
 	{
-		if (empty($value)) {
-			$value = $operator;
-			$operator = '=';
+		if (empty($columns)) return $this
+
+		//简单处理 where条件
+		if (is_array($columns)) {
+			foreach ($columns as $key => $value) {
+				if (is_array($value)) {
+					$this->_where[] = [$key, $value[0], $value[1]];
+				} else {
+					$this->_where[] = [$key, '=', $value];
+				}
+			}
+		} else {
+			if (is_null($value)) {
+				$value = $operator;
+				$operator = '=';
+			}
+			$this->_where[] = [$columns, $operator, $value];
 		}
-
-		$this->_where[] = [$column, $operator, $value];
-
 		return $this;
 	}
 
-	public function whereIn($column, $value = []) 
+	public function field($columns)
 	{
-		return $this->where($column, 'IN', $value);
-	}
-
-	public function orWhere($column, $operator, $value = null)
-	{
-		if (empty($value)) {
-			$value = $operator;
-			$operator = '=';
+		if (empty($columns)) return $this;
+		if (is_array($columns)) {
+			$this->_columns = $columns;
+		} else if (count(func_get_args()) > 0) {
+			$this->_columns = func_get_args();
+		} else {
+			$this->_columns = explode(',', $columns);
 		}
-
-		$this->_where[] = [[$column, $operator, $value]];
-
-		return $this;
-	}
-
-	public function select($columns = ['*'])
-	{
-		$this->columns = [];
-
-        $columns = is_array($columns) ? $columns : func_get_args();
-
-        $this->columns = $columns;
-
         return $this;
 	}
-
-	public function groupBy($value = '')
-	{
-		$this->_groupBy = $value;
-
-		return $this;
-	}
-
-	public function orderBy($value = '', $type = 'DESC')
-	{
-		$this->_orderBy = $value . ' ' . strtoupper($type);
-
-		return $this;
-	}
-
-	public function limit($value)
-    {
-    	$value = (int) $value;
-        $this->_limit = $value > 0 ? $value : 0;
-        return $this;
-    }
-
-	public function offset($value)
-    {
-    	$value = (int) $value;
-        $this->_offset = $value > 0 ? $value : 0;
-
-        return $this;
-    }
 
 	public function get()
 	{
@@ -113,7 +73,7 @@ Class Query
 	{
 		$this->_offset = 0;
 		$this->_limit = 1;
-		return $this->getResult()[0] ?? [];
+		return $this->get()[0] ?? [];
 	}
 
 	public function count()
@@ -121,275 +81,173 @@ Class Query
 		$this->_columns = ['COUNT(*) as count'];
 		$this->_offset = 0;
 		$this->_limit = 1;
-
-		$result = $this->getResult();
-
+		$result = $this->get();
 		return $result[0]['count'] ?? 0;
 	}
 
-	public function getResult()
+	public function insert(array $data = [])
 	{
-		$sql = $this->getSql();
-		return $this->getQuery($sql, $this->_param);
+		if (empty($data)) return false;
+		if (empty($data[0])) $data = [$data];
+
+		$fields = array_keys($data[0]);
+		$data = array_map(function($value){
+			return "'".implode("', '", $value)."'";
+		}, $data);
+		$sql = sprintf('INSERT INTO %s (`%s`) VALUES %s', $this->_table, implode('`, `', $fields), '(' . implode('), (', $data).')');
+		return $this->getQuery($sql);
 	}
 
-	public function getSql()
+	public function insertGetId($data)
+	{
+		$result = $this->insert($data);
+		if (!$result) return 0;
+		$result = $this->getQuery('SELECT LAST_INSERT_ID() AS last_insert_id');
+		if (empty($result)) return 0;
+		return $result[0]['last_insert_id'] ?? 0;
+	}
+
+	private function getResult()
+	{
+		return $this->getQuery($this->getSql(), $this->_param);
+	}
+
+	private function getSql()
 	{
 		if (empty($this->_table)) {
 			throw new \Exception('MySQL SELECT QUERY, table not exist!', 1);
 		}
-
 		//解析条件
 		$this->analyzeWhere();
-
-		$sql = sprintf('SELECT %s FROM %s', !empty($this->_columns) ? implode(',', $this->_columns) : '*', $this->_table ?? '');
-
-		if (!empty($this->_whereStr)) {
-			$sql .= ' WHERE ' . $this->_whereStr;
+		$sql = sprintf('SELECT %s FROM `%s`', !empty($this->_columns) ? implode(', ', $this->_columns) : '*', $this->_table ?? '');
+		if (!empty($this->_whereString)) {
+			$sql .= ' WHERE 1=1 ' . $this->_whereString;
 		}
-
 		if (!empty($this->_groupBy)) {
 			$sql .= ' GROUP BY ' . $this->_groupBy;
 		}
-
 		if (!empty($this->_orderBy)) {
 			$sql .= ' ORDER BY ' . $this->_orderBy;
 		}
-
 		if ($this->_offset !== null) {
 			$sql .= ' LIMIT ' . (int) $this->_offset;
 		}
-
 		if ($this->_limit !== null ) {
 			$sql .= ',' . (int) $this->_limit;
 		}
+		return $sql;
+	}
 
+	private function analyzeWhere()
+	{
+		if (empty($this->_where)) return false;
+
+		$this->_whereString = '';
+		$this->_param = [];
+		foreach ($this->_where as $item) {
+			$fields = $item[0];
+			$operator = $item[1];
+			$value = $item[2];
+			$operator = strtoupper($operator);
+			$fields = explode(',', $fields);
+			$fieldscount = count($fields);
+			if ($fieldscount > 1) {
+				$this->_whereString .= ' AND (';
+				$type = ' OR';
+			} else {
+				$type = ' AND';
+			}
+			$tempStr = '';
+			foreach ($fields as $fk => $fv) {
+				$fv = trim($fv);
+				switch ($operator) {
+					case 'IN':
+						if (!is_array($value)) $value = explode(',', $value);
+						$inStr = '';
+						foreach ($value as $invalue) {
+							if ($inkey > 0) {
+								$inStr .= ', ';
+							}
+							$inStr .= '?';
+						}
+						$tempStr .= sprintf('%s `%s` %s (%s)', $fk == 0 && $fieldscount > 1 ? '' : $type, $fv, $operator, $inStr);
+						$this->_param = array_merge($this->_param, $value);
+						break;
+					default:
+						$tempStr .= sprintf('%s `%s` %s ?', $fk == 0 && $fieldscount > 1 ? '' : $type, $fv, $operator);
+						$this->_param[] = $value;
+						break;
+				}
+			}
+			$this->_whereString .= $tempStr;
+
+			if ($fieldscount > 1) {
+				$this->_whereString .= ' )';
+			}
+		}
+		return true;
+	}
+
+	private function getQuery($sql = '', $params = [])
+	{
+		if (env('APP_DEBUG')) {
+			$GLOBALS['exec_sql'][] = sprintf(str_replace('?', '%s', $sql), ...$params);
+		}
+		$conn = \frame\Connection::getInstance($this->_connect, $this->_database);
+		if (!empty($params)) {
+			if ($stmt = $conn->prepare($sql)) {
+				//这里是引用传递参数
+			    $stmt->bind_param($this->analyzeType(), ...$params);
+			    $stmt->execute();
+			    $result = $stmt->get_result();
+		        while ($row = $result->fetch_assoc()) {
+		        	$returnData[] = $row;
+		        }
+			    $stmt->free_result();
+			    $stmt->close();
+			} else {
+				throw new \Exception($conn->error, 1);
+			}
+		} else {
+			if ($stmt = $conn->query($sql)) {
+				if (is_bool($stmt)) {
+					$returnData =  mysqli_affected_rows($conn);
+				} else {
+					while ($row = $stmt->fetch_assoc()){
+					 	$returnData[] = $row;
+					}
+					$stmt->free();
+				}
+			} else {
+				throw new \Exception($conn->error, 1);
+			}
+		}
+		$conn->close();
+		$this->clear();
+		return $returnData ?? false;
+	}
+
+	private function clear()
+	{
 		//清空储存数据
 		$this->_columns = null;
 		$this->_where = [];
-		$this->_whereStr = '';
+		$this->_whereString = '';
 		$this->_param = [];
 		$this->_groupBy = '';
 		$this->_orderBy = '';
 		$this->_offset = null;
 		$this->_limit = null;
-
-		return $sql;
+		return true;
 	}
 
-	/**
-	 * @method 查询语句 sql + 预处理语句结果
-	 * @date   2020-04-11
-	 * @return array
-	 */
-	public function getQuery($sql = '', $params = [])
-	{
-		$conn = \frame\Connection::getInstance($this->_db, $this->_database);
-
-		$returnData = [];
-		if (empty($sql)) return $returnData;
-
-		if (!empty($params)) {
-
-			if ($stmt = $conn->prepare($sql)) {
-				//这里是引用传递参数
-			    if(is_array($params))
-		        {
-		        	if (!is_array(current($params))) {
-		        		reset($params);
-		        		$params = [$params];
-		        	}
-
-		        	foreach ($params as $key => $value) {
-		        		$type = $this->analyzeType($value);
-			            $bind_names[] = $type;
-			            for ($i=0; $i < count($value); $i++) 
-			            {
-			                $bind_name = 'bind_' . $i;
-			                $$bind_name = $value[$i];
-			                $bind_names[] = &$$bind_name;
-			            }
-
-		            	call_user_func_array(array($stmt, 'bind_param'), $bind_names);
-
-		            	/* execute query */
-			    		$stmt->execute();
-				        $meta = $stmt->result_metadata(); 
-
-				        if ($meta->type) {
-					        $variables = [];
-					        $data = [];
-					        while ($field = $meta->fetch_field()) { 
-					            $variables[] = &$data[$field->name];
-					        }
-
-					        call_user_func_array(array($stmt, 'bind_result'), $variables); 
-
-					        $i=0;
-					        while($stmt->fetch())
-					        {
-					            $returnData[$i] = [];
-					            foreach($data as $k => $v) {
-					                $returnData[$i][$k] = $v;
-					            }
-
-					            $i++;
-					        }
-				        }
-		        	}
-		        } else {
-		        	throw new \Exception('SQL 参数设置错误!');
-		        }
-
-			    $stmt->free_result();
-			    $stmt->close();
-			} else {
-				throw new \Exception($sql . ' SQL 错误!');
-			}
-		} else {
-			if ($stmt = $conn->query($sql)) {
-				while ($row = $stmt->fetch_assoc()){
-				 	$returnData[] = $row;
-				}
-
-				$stmt->free();
-
-				return $returnData;
-			}
-		}
-
-		return $returnData;
-	}
-
-	/**
-	 * @method 参数匹配 ? 占位符
-	 * @date   2020-05-19
-	 * @return string
-	 */
-	private function analyzeMatch($data)
-	{
-		if (empty($data) || !is_array($data)) return '';
-		$str = '';
-		for ($i=0; $i < count($data); $i++) { 
-			$str .= '? ,';
-		}
-
-		return trim(trim(trim($str), ','));
-	}
-
-	/**
-	 * @method 处理 where 条件
-	 * @date   2020-05-19
-	 * @return array
-	 */
-	private function analyzeWhere()
-	{
-		$returnData = ['where'=>'', 'param' => []];
-		if (empty($this->_where)) return ['where'=>'', 'param' => []];
-
-		$orStatus = false;
-		foreach ($this->_where as $key => $value) {
-			$where = '';
-			$param = [];
-			if (is_array($value)) {
-				if (is_array($value[0])) { // OR 分组
-					$tempOrStr = '';
-					$orStatus = true;
-					foreach ($value as $k => $v) {
-						$tempCount = count($v);
-						if ($tempCount == 3) {
-							switch (strtoupper($v[1])) {
-								case 'IN':
-									$tempOrStr .= sprintf(' OR %s %s (?)', $v[0], strtoupper($v[1]));
-									break;
-								default:
-									$tempOrStr .= sprintf(' OR %s %s ?', $v[0], strtoupper($v[1]));
-									break;
-							}
-							$param[] = is_array($v[2]) ? implode(',', $v[2]) : $v[2];
-						} else if (!empty($v[0]) && $tempCount == 2){ 
-							//默认 = 条件的
-							$tempOrStr .= ' OR '.$v[0].' = ?';
-							$param[] = $v[1];
-						} else { //键值对条件的
-							foreach ($v as $kk => $vv) { 
-								$tempOrStr .= ' OR '.$k.' = ?';
-								$param[] = $v;
-							}
-						}
-					}
-
-					$where = $tempOrStr;
-				} else {
-					$tempCount = count($value);
-					if ($tempCount == 3) {
-						switch (strtoupper($value[1])) {
-							case 'IN':
-								$inStr = '';
-								foreach ($value[2] as $invalue) {
-									$inStr .= ' ? ,';
-								}
-								$inStr = trim(trim($inStr, ','));
-								$where .= sprintf(' AND %s %s (%s)', $value[0], strtoupper($value[1]), $inStr);
-								break;
-							default:
-								$where .= sprintf(' AND %s %s ?', $value[0], strtoupper($value[1]));
-								break;
-						}
-
-						$param = array_merge($param, is_array($value[2]) ? $value[2] : [$value[2]]);
-					} else if (!empty($value[0]) && $tempCount == 2){ //默认 = 条件的
-						$where .= ' AND '.$value[0].' = ?';
-						$param[] = $value[1];
-					} else { //键值对条件的
-						foreach ($value as $k => $v) { 
-							$where .= ' AND '.$k.' = ?';
-							$param[] = $v;
-						}
-					}
-				}
-			} else {
-				$where .= ' AND '.$key.' = ?';
-				$param[] = $value;
-			}
-
-			if (empty($returnData['where']) && $orStatus) {
-				$returnData['where'] = trim(trim(trim($where), 'OR'));
-			} else if (!empty($returnData['where'])) {
-				if ($orStatus) {
-					$returnData['where'] = '('.trim(trim(trim($returnData['where']), 'AND')).')'.$where;
-				} else {
-					$returnData['where'] .= $where;
-					$orStatus = false;
-				}
-			} else {
-				$returnData['where'] .= $where;
-				$orStatus = false;
-			}
-
-			$returnData['param'] = array_merge($returnData['param'] ?? [], $param);
-		}
-
-		$this->_whereStr = trim(trim(trim($returnData['where']), 'AND'));
-		$this->_param = $returnData['param'] ?? [];
-
-		return $this;
-	}
-
-	/**
-	 * @method 解析 where 参数组合类型
-	 * @date   2020-04-11
-	 */
 	private function analyzeType()
 	{
-		if (empty($this->_where)) return '';
-
 		$typeStr = '';
-		foreach ($this->_where as $key => $value) {
+		foreach ($this->_param as $key => $value) {
 			if (is_numeric($value)) $typeStr .= 'd';
 			else $typeStr .= 's';
 		}
-
 		return $typeStr;
 	}
 }

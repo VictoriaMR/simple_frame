@@ -9,43 +9,51 @@ class Html
 
 	public static function addCss($name = '')
 	{
-		if (empty($name)) return false;
-
-		if (is_array($name)) {
-			foreach ($name as $value) {
-				self::$_CSS[] = getenv('APP_DOMAIN') . 'css/' . $value . '.css';
-			}
-		} else {
-			self::$_CSS[] = getenv('APP_DOMAIN') . 'css/' . $name . '.css';
-		}
-		return true;
+		$matchPath = '';
+        if (env('APP_VIEW_MATCH')) {
+            $matchPath = (isMobile() ? 'Mobile' : 'Computer') . DS;
+        }
+        if (empty($name)) {
+            $_route = \Router::$_route;
+            $name = $_route['path'] . DS . $_route['func'];
+        } else {
+            if (false === strrpos($name, DS)) {
+                $_route = \Router::$_route;
+                $name = $_route['path'] . DS . $_route['func'];
+            }
+        }
+        self::$_CSS[] = APP_DOMAIN . 'css' . DS . $matchPath . $name . '.css';
+        return true;
 	}
 
-	public static function addJs($name = '')
+	public static function addJs($name = '', $public = false)
 	{
-		if (empty($name)) return false;
-
-		if (is_array($name)) {
-			foreach ($name as $value) {
-				self::$_JS[] = getenv('APP_DOMAIN') . 'js/' . $value . '.js';
-			}
-		} else {
-			self::$_JS[] = getenv('APP_DOMAIN') . 'js/' . $name . '.js';
-		}
-		return true;
+		$matchPath = '';
+        if (env('APP_VIEW_MATCH')) {
+            $matchPath = (isMobile() ? 'Mobile' : 'Computer') . DS;
+        }
+        if (empty($name)) {
+            $_route = \Router::$_route;
+            $name = $_route['path'] . DS . $_route['func'];
+        } else {
+            if (false === strrpos($name, DS)) {
+                $_route = \Router::$_route;
+                $name = $_route['path'] . DS . $_route['func'];
+            }
+        }
+        self::$_JS[] = APP_DOMAIN . 'js' . DS . $matchPath . $name . '.js';
+        return true;
 	}
 
 	public static function getCss()
 	{
 		if (empty(self::$_CSS)) return [];
-
 		return array_unique(self::$_CSS);
 	}
 
 	public static function getJs()
 	{
 		if (empty(self::$_JS)) return [];
-
 		return array_unique(self::$_JS);
 	}
 }

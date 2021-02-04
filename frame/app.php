@@ -1,198 +1,84 @@
 <?php
-
-use frame\Html;
-
 class App 
 {
 	private static $_instance = null;
-	const VERSION = '5.1.0';
-
-	/**
-     * 版本号
-     */
-    public function version()
-    {
-        return static::VERSION;
-    }
 
     public static function instance() 
     {
-    	if (!(self::$_instance instanceof self)) {
+    	if (is_null(self::$_instance)) {
 			self::$_instance = new self();
 		}
-
 		return self::$_instance;
     }
 
-	/**
-	 * 框架初始化方法 运行方法的实例化 路由解析等
-	 */
 	public static function run() 
 	{
 		//初始化方法
 		self::init();
-
-		//解析路由
-		Router::analyze_func();
-
         //注册异常处理
-        Erroring::register();
-
+        \frame\Error::register();
+		//解析路由
+        Router::analyze();
 		return self::instance();
 	}
 
-	/**
-	 * @method 执行方法
-	 * @return object_array
-	 */
-	public function send() 
-	{
-		//路由解析
-		$info = Router::$_route;
-
-		$class = 'App\\Http\\Controllers\\'.$info['Class'].'\\'.$info['ClassPath'].'Controller';
-
-		\App\Http\Middleware\VerifyToken::handle($info);
-
-        if ($info['Class'] != 'Api') {
-            //引入公共css js
-            Html::addCss(['common', 'font', 'icon', 'space']);
-            Html::addJs(['jquery.min', 'common']);
-        }
-
-		call_user_func_array([self::autoload($class), $info['Func']], []);
-
-        // 应用调试模式
-        if (Env('APP_DEBUG')) {
-            self::debugModeInit();
-        }
-
-        exit();
-	}
-
-	/**
-	 * 初始化方法
-	 */
-	private static function init() 
-	{
-		// 自动装载 # 注册__autoload()函数
-		spl_autoload_register([ __CLASS__ , 'autoload']);
-	}
-
-	/**
-	 * @method 自动加载
-	 * @date   2020-05-25
-	 * @param  $abstract 对象
-	 * @return object
-	 */
-	protected static function autoload($abstract) 
+    public function send()
     {
-    	if (!empty($GLOBALS['autoload']) && !empty($GLOBALS['autoload'][$abstract])) {
-    		$fileName = $GLOBALS['autoload'][$abstract];
-    	} else {
-    		$fileName = $abstract;
-    	}
-
-        $temp = explode('/', $fileName);
-        if ($temp[0] == 'frame') {
-            for ($i=1; $i < count($temp); $i++) { 
-                $temp[$i] = strtolower($temp[$i]);
-            }
-            $fileName = implode('/', $temp);
-            unset($temp);
+        //路由解析
+        $info = Router::$_route;
+        //中间件
+        \App\Middleware\VerifyToken::handle($info);
+        //执行方法
+        $class = 'App\\Controllers\\'.$info['class'].'\\'.$info['path'].'Controller';
+        if (is_callable([self::autoload($class), $info['func']])) {
+            call_user_func_array([self::autoload($class), $info['func']], []);
         }
-
-        $fileName = ROOT_PATH . str_replace(['\\', 'App/'], ['/', 'app/'], $fileName) . '.php';
-
-        if (is_file($fileName)){
-			require_once $fileName;
-		} else {
-			throw new Exception( $abstract .' was not exist!', 0);
-		}
-
-        $concrete = Container::getInstance()->autoload($abstract);
-
-		return $concrete;
+        $this->runover();
     }
 
-    /**
-     * @method 实例化入口
-     * @date   2020-05-25
-	 * @param  $abstract 对象
-	 * @return object
-     */
+    public function load($template = '')
+    {
+        return \frame\View::load($template);
+    }
+
+	public static function init() 
+	{
+		spl_autoload_register([__CLASS__ , 'autoload']);
+	}
+
+	private static function autoload($abstract) 
+    {
+        $abstract = strtr($abstract, '/', '\\');
+        //容器加载
+        if (!empty(Container::$_building[$abstract])) {
+            return Container::$_building[$abstract];
+        }
+        $file = strtr($abstract, '\\', DS);
+        if (strpos($file, 'App') === 0) {
+            $file = lcfirst($file);
+        } else if (strpos($file, 'frame') !== false) {
+            $file = strtolower($file);
+        }
+        $file = ROOT_PATH.$file.'.php';
+        if (is_file($file)) {
+			require_once $file;
+        } else {
+			throw new \Exception($abstract.' was not exist!', 1);
+        }
+		return Container::getInstance()->autoload($abstract);
+    }
+
     public static function make($abstract)
     {
-    	return self::autoload(str_replace('/', '\\', $abstract));
+    	return self::autoload($abstract);
     }
 
-    /**
-     * 调试模式设置
-     * @access protected
-     * @return void
-     */
-    protected static function debugModeInit()
+    private function runover()
     {
-        // 获取基本信息
-        $runtime = number_format(microtime(true) - APP_START_TIME, 10, '.', '');
-        $reqs    = $runtime > 0 ? number_format(1 / $runtime, 2) : '∞';
-        $mem     = number_format((memory_get_usage() - MEM0RY_START) / 1024, 2);
-
-        $uri = implode(' ', [
-        	$_SERVER['SERVER_PROTOCOL'],
-        	$_SERVER['REQUEST_METHOD'],
-        	$_SERVER['HTTP_HOST'].$_SERVER['REQUEST_URI'],
-        ]);
-
-        $info = get_included_files();
-        $fileMem = 0;
-        foreach ($info as $key => $file) {
-            $temp = number_format(filesize($file) / 1024, 2);
-            $fileMem += $temp;
-            $info[$key] .= ' ( ' . $temp . ' KB )';
+        if (env('APP_DEBUG')) {
+            \frame\Debug::runlog();
+            \frame\Debug::init();
         }
-
-        $base = [
-            '请求信息' => date('Y-m-d H:i:s', $_SERVER['REQUEST_TIME']) . ' ' . $uri,
-            '运行时间' => number_format((float) $runtime, 6) . 's [ 吞吐率：' . $reqs . ' req/s ] 内存消耗：' . $mem . ' KB 文件加载：' . count($info),
-            '查询信息' => '',
-            '缓存信息' => '',
-            '文件总值' => $fileMem . ' KB',
-        ];
-
-        $config = [
-	        'file' => '',
-	        'tabs' => ['base' => '基本', 'file' => '文件', 'info' => '流程', 'notice|error' => '错误', 'sql' => 'SQL'],
-	    ];
-
-        $trace = [];
-        foreach ($config['tabs'] as $name => $title) {
-            $name = strtolower($name);
-            switch ($name) {
-                case 'base': // 基本信息
-                    $trace[$title] = $base;
-                    break;
-                case 'file': // 文件信息
-                    $trace[$title] = $info;
-                    break;
-                default: // 调试信息
-                    if (strpos($name, '|')) {
-                        // 多组信息
-                        $names  = explode('|', $name);
-                        $result = [];
-                        foreach ($names as $item) {
-                            $result = array_merge($result, $log[$item] ?? []);
-                        }
-                        $trace[$title] = $result;
-                    } else {
-                        $trace[$title] = $log[$name] ?? '';
-                    }
-            }
-        }
-
-        assign('trace', $trace);
-        assign('runtime', $runtime);
-
-        echo fetch('frame/pagetrace');
+        exit();
     }
 }

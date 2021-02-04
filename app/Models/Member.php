@@ -6,68 +6,29 @@ use App\Models\Base as BaseModel;
 
 class Member extends BaseModel
 {
+    const INFO_CACHE_TIMEOUT = 3600 *24;
+    const TYPE_MEMBER_CUSTOMER = 1;
+    const TYPE_MEMBER_PROXY = 3;
+    const TYPE_MEMBER_ADMIN = 5;
+    
     //表名
-    public $table = 'member';
-
+    protected $_table = 'member';
     //主键
-    protected $primaryKey = 'mem_id';
+    protected $_primaryKey = 'mem_id';
 
-    /**
-	 * @method 检查用户
-	 * @author Victoria
-	 * @date   2020-01-09
-	 * @param  string    $name 
-	 * @return boolean 
-	 */
-    public function isExistUserByName($name)
-    {
-    	if (empty($name)) return false;
-
-    	$result = $this->getOne($this->table, [[['mobile', $name], ['name', $name]]], ['COUNT(*) count']);
-
-    	return (int) $result['count'] > 0;
-    }
-
-    /**
-     * @method 检查用户
-     * @author Victoria
-     * @date   2020-01-09
-     * @param  string    $name 
-     * @return boolean 
-     */
     public function isExistUserByMobile($mobile)
     {
         if (empty($mobile)) return false;
-
-        $result = $this->getOne($this->table, ['mobile' => $mobile], ['COUNT(*) count']);
-
-        return (int) $result['count'] > 0;
+        return $this->getCount(['mobile' => $mobile])['count'] ?? 0;
     }
 
-    /**
-     * @method 根据名称或者手机号码获取信息
-     * @author Victoria
-     * @date   2020-01-11
-     * @return array
-     */
-    public function getInfoByName($name)
-    {
-    	$result = $this->getOne($this->table, [[['mobile', $name], ['name',$name]]]);
-
-    	return $result;
-    }
-
-    /**
-     * @method 根据手机号码获取信息
-     * @author Victoria
-     * @date   2020-01-11
-     * @return array
-     */
     public function getInfoByMobile($mobile)
     {
-    	$result = $this->where('mobile', $mobile)
-                       ->find();
+    	return $this->getInfoByWhere(['mobile' => $mobile]);
+    }
 
-        return $result;
+    public function getInfo($userId)
+    {
+        return $this->loadData($userId);
     }
 }

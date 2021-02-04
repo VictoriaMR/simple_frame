@@ -1,5 +1,4 @@
 <?php
-
 return [
 	'default' => [
 		'db_host'	  => Env('DB_HOST', '127.0.0.1'), 	//地址
