@@ -21,7 +21,7 @@ final class Router
 					'func' => 'index',
 				];
 			} else {
-		        self::$_route['class'] = ucfirst(array_shift($pathInfo));
+		        self::$_route['class'] = APP_TEMPLATE_TYPE;
 		        switch (count($pathInfo)) {
 		        	case 0:
 		        		self::$_route['path'] = 'Index';
