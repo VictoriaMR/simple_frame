@@ -17,7 +17,7 @@ class Kernal
         if (empty(self::COMMON_LIST)) return false;
         foreach (self::COMMON_LIST as $value) {
             if ($this->matchTime($value[2] ?? '')) {
-                $this->execCommand('php '.ROOT_PATH.'artisan '.$value[0].' '.$value[1]);
+                $this->execCommand('php '.ROOT_PATH.'command '.$value[0].' '.$value[1]);
             }
         }
         return true;
